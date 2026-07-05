@@ -10,6 +10,10 @@
 > T-count optimizer, a tower-compression optimizer, or a compiler semantic-equivalence
 > engine, and it does **not** claim passive dimension embedding is free. See
 > [`ALPHA_README.md`](ALPHA_README.md) for the full positioning.
+
+> **Part of a larger program.** Q-Kernel is the software component of a research program on
+> contextuality as cohomological obstructions. Papers, machine-checkable verifications, and hardware
+> results: [`manuflog/contextuality-obstructions`](https://github.com/manuflog/contextuality-obstructions).
 **Q-Kernel** is an experimental Python library for contextuality kernel extraction in Weyl/Pauli measurement programs.
 
 It implements the binary-linear-algebra core behind the odd-$Q$ criterion:
