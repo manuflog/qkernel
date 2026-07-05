@@ -31,9 +31,8 @@ FALSE -- d=8 is 2-primary yet activates as rarely as, or more rarely than, d=6. 
 from __future__ import annotations
 
 import math
+import random
 import sys
-
-import numpy as np
 
 sys.path.insert(0, "src")
 from qkernel.ir import WeylProgram
@@ -47,13 +46,13 @@ def _symp(u, v):
 
 
 def rand_base(d, seed, nctx, m=2):
-    rng = np.random.default_rng(seed)
+    rng = random.Random(seed)
     out = []
 
     def rc():
         for _ in range(400):
-            u = tuple(int(x) for x in rng.integers(0, d, 2 * m))
-            v = tuple(int(x) for x in rng.integers(0, d, 2 * m))
+            u = tuple(rng.randrange(0, d) for _ in range(2 * m))
+            v = tuple(rng.randrange(0, d) for _ in range(2 * m))
             if _symp(u, v) % d == 0:
                 w = tuple((-(u[i] + v[i])) % d for i in range(2 * m))
                 if _symp(u, w) % d == 0 and _symp(v, w) % d == 0:

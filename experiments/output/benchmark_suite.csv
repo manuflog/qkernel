@@ -1,0 +1,4 @@
+contexts,t_decomp_ms,t_flat_ms,kernel,contextual,verified,solvers_agree
+6,0.311,0.356,6,True,True,True
+31,1.399,1.257,6,True,True,True
+106,10.482,8.944,6,True,True,True
