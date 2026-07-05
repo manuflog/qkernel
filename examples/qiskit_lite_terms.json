@@ -1,0 +1,9 @@
+{
+  "type": "qiskit_sparse_pauli_terms",
+  "qubit_order": "qiskit",
+  "terms": [
+    {"pauli": "IZ", "layer": "r0", "coeff": 1.0},
+    {"pauli": "ZI", "layer": "r0", "coeff": 1.0},
+    {"pauli": "ZZ", "layer": "r0", "coeff": -1.0}
+  ]
+}

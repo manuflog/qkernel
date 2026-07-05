@@ -1,0 +1,9 @@
+{
+  "type": "pauli_schedule",
+  "comment": "This intentionally puts all Peres-Mermin observables in one layer. It is not a real schedule unless all are co-measured/considered as one compatibility block. The extractor may generate contexts that were not actual circuit layers.",
+  "layers": [
+    ["ZI", "IZ", "ZZ", "IX", "XI", "XX", "ZX", "XZ", "YY"]
+  ],
+  "include_full_layers": false,
+  "include_closed_triples": true
+}

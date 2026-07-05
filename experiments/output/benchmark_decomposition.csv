@@ -1,0 +1,10 @@
+noise_blocks,contexts,observables,components,kernel_contexts,kernel_observables,verification_valid,t_components_ms,t_compress_decomp_ms,t_compress_nodecomp_ms,t_verify_ms,same_kernel
+0,6,9,1,6,9,True,0.0184,0.1753,0.1554,0.112,True
+1,7,12,2,6,9,True,0.0162,0.1832,0.1655,0.1179,True
+5,11,24,6,6,9,True,0.0311,0.2519,0.2425,0.1411,True
+10,16,39,11,6,9,True,0.0495,0.3401,0.3777,0.1765,True
+25,31,84,26,6,9,True,0.1067,0.6054,0.9444,0.2943,True
+50,56,159,51,6,9,True,0.2322,1.0351,2.6312,0.5502,True
+100,106,309,101,6,9,True,0.4682,1.9503,8.6265,1.2811,True
+250,256,759,251,6,9,True,1.4777,4.9229,58.3549,6.4362,True
+500,506,1509,501,6,9,True,4.1014,10.5471,242.1095,20.8099,True
