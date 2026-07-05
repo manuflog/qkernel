@@ -1,0 +1,15 @@
+# Stim-lite MPP subset for the Peres-Mermin square.
+# Each TICK-delimited block is treated as one schedule layer.
+# This is not a full Stim circuit.
+
+MPP Z0 Z1 Z0*Z1
+TICK
+MPP X1 X0 X0*X1
+TICK
+MPP Z0*X1 X0*Z1 Y0*Y1
+TICK
+MPP Z0 X1 Z0*X1
+TICK
+MPP Z1 X0 X0*Z1
+TICK
+MPP Z0*Z1 X0*X1 Y0*Y1

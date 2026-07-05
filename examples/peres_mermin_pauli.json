@@ -1,0 +1,11 @@
+{
+  "type": "pauli_contexts",
+  "contexts": [
+    ["ZI", "IZ", "ZZ"],
+    ["IX", "XI", "XX"],
+    ["ZX", "XZ", "YY"],
+    ["ZI", "IX", "ZX"],
+    ["IZ", "XI", "XZ"],
+    ["ZZ", "XX", "YY"]
+  ]
+}
