@@ -17,7 +17,10 @@ def test_release_audit_passes():
     report = run_release_audit(ROOT)
 
     assert report.passed
-    assert report.version == "0.33.0"
+    # version is read from package metadata; assert it matches rather than a
+    # hard-coded literal so the test survives version bumps.
+    from qkernel.metadata import QKERNEL_VERSION
+    assert report.version == QKERNEL_VERSION
     assert "contextuality kernels" in report.safe_positioning
     assert any("not a T-count" in item for item in report.unsafe_positioning)
 

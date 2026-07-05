@@ -1,4 +1,49 @@
 # Changelog
+## [0.37.0] - 2026-07-05
+
+### Fixed (correctness)
+- **`export-circuit` no longer emits a pinned (vacuous) statistic.** The previous
+  emitter measured each context with a single joint measurement and reconstructed
+  the third observable as `sign * o0 * o1`, making the product `sign` on every shot
+  regardless of the device — it certified nothing. The emitter now produces a
+  **sequential non-destructive (ancilla Hadamard-test) protocol** whose statistic
+  is genuinely data-dependent (validated on IBM hardware: 37.8σ single-device,
+  replicated multi-device). Regression test `test_emitted_statistic_is_data_dependent_not_pinned`
+  guards against reintroducing the pinned form.
+- Emitted script uses token-based auth (`QISKIT_IBM_TOKEN`) instead of the retired
+  `channel='ibm_quantum'`, and adds best-qubit-triple pinning, dynamical decoupling,
+  twirling, error bars, and σ-above-bound reporting.
+
+
+
+## 0.36.0
+
+- Added `qkernel spectrum --d D`: one-call obstruction spectrum for a local
+  dimension (H(d)={0,d/2} even, {0} odd) with value order and 2-primary
+  structure; a pure dimension-level lookup, no program file needed.
+- Added `spectrum_summary` in valuation, `docs/SPECTRUM.md`, and
+  `tests/test_spectrum.py`.
+
+## 0.35.0
+
+- Added `qkernel export-circuit`: synthesise a runnable Qiskit measurement
+  protocol from a two-qubit kernel (theory -> certificate -> runnable hardware
+  test). Clifford diagonaliser per context, baked-in readout tables, emitted as
+  a standalone IBM script.
+- Every synthesised circuit is exact-sim verified (state-independent) before
+  emission; scope-guarded to d=2, m=2 (refuses higher d rather than emit
+  unverified circuits).
+- Added `qiskit`/`qiskit-ibm-runtime` as an optional `[hardware]` extra
+  (imported lazily; core package has no new hard dependency).
+- Added `docs/EXPORT_CIRCUIT.md` and `tests/test_export_circuit.py`.
+
+## 0.34.0
+
+- Added 2-primary obstruction-value corollary: value d/2 is always 2-primary
+  (zero in the odd CRT factor), so the mod-2 carry shadow is value-faithful at
+  every even d, not just 2-powers.
+- Added `qkernel two-primary` CLI and `two_primary_report` in valuation.
+- Added `docs/TWO_PRIMARY.md` and `tests/test_two_primary.py`.
 
 ## 0.33.0
 

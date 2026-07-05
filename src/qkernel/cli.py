@@ -28,7 +28,8 @@ from .backends.pysat_backend import OptionalBackendUnavailable, solve_sat_with_p
 from .compiler import compiler_report_dict, compare_compiler_pass_dict
 from .selftest import run_selftest_dict
 from .rewrite_policy import list_rewrite_policies_dict, assess_rewrite_candidate_dict
-from .valuation import check_zd_valuation, check_kernel_zd_valuation
+from .valuation import check_zd_valuation, check_kernel_zd_valuation, two_primary_report, spectrum_summary
+from .export_circuit import export_qiskit_protocol
 
 
 def _add_solver_args(cmd) -> None:
@@ -223,6 +224,20 @@ def main() -> None:
     zd_cmd = sub.add_parser("zd-valuation", help="check genuine Z_d valuation-system contextuality")
     zd_cmd.add_argument("path")
     zd_cmd.add_argument("--input", choices=["weyl", "pauli", "schedule", "table", "stim-lite", "qiskit-lite"], default="weyl")
+
+    two_primary_cmd = sub.add_parser("two-primary", help="report 2-primary structure of the obstruction value and mod-2 shadow value-faithfulness")
+    two_primary_cmd.add_argument("path")
+    two_primary_cmd.add_argument("--input", choices=["weyl", "pauli", "schedule", "table", "stim-lite", "qiskit-lite"], default="weyl")
+
+    spectrum_cmd = sub.add_parser("spectrum", help="obstruction spectrum H(d)={0,d/2} + 2-primary structure for a local dimension d (no program file needed)")
+    spectrum_cmd.add_argument("--d", type=int, required=True, help="local dimension d")
+
+    export_circuit_cmd = sub.add_parser("export-circuit", help="export a runnable Qiskit measurement protocol for a 2-qubit kernel (theory -> runnable hardware test)")
+    export_circuit_cmd.add_argument("path")
+    export_circuit_cmd.add_argument("--input", choices=["weyl", "pauli", "schedule", "table", "stim-lite", "qiskit-lite"], default="weyl")
+    export_circuit_cmd.add_argument("--out", help="write the runnable script to this path", default=None)
+    export_circuit_cmd.add_argument("--contexts", help="comma-separated context indices (default: all)", default=None)
+    export_circuit_cmd.add_argument("--no-verify", action="store_true", help="skip exact-sim verification (not recommended)")
 
     rewrite_policies_cmd = sub.add_parser("rewrite-policies", help="list Q-Kernel rewrite/optimizer policy guardrails")
 
@@ -518,6 +533,58 @@ def main() -> None:
             "phases": result.phases,
             "observable_order": result.observable_order,
             "reason": result.reason,
+        }, indent=2))
+
+    elif args.command == "two-primary":
+        program = _load_by_kind(args.path, args.input)
+        result = check_zd_valuation(program)
+        tp = two_primary_report(result.modulus)
+        print(json.dumps({
+            "contextual": result.contextual,
+            "modulus": tp.modulus,
+            "two_adic_valuation": tp.two_adic_valuation,
+            "odd_part": tp.odd_part,
+            "value_dover2": tp.value_dover2,
+            "value_odd_component": tp.value_odd_component,
+            "is_two_primary": tp.is_two_primary,
+            "shadow_value_faithful": tp.shadow_value_faithful,
+            "reason": tp.reason,
+        }, indent=2))
+
+    elif args.command == "export-circuit":
+        program = _load_by_kind(args.path, args.input)
+        selected = None
+        if args.contexts:
+            selected = [int(x) for x in args.contexts.split(",")]
+        try:
+            proto = export_qiskit_protocol(program, selected, verify=not args.no_verify)
+        except ValueError as exc:
+            print(json.dumps({"ok": False, "error": str(exc)}, indent=2))
+            return
+        if args.out:
+            with open(args.out, "w") as fh:
+                fh.write(proto.script)
+        print(json.dumps({
+            "ok": True,
+            "n_contexts": proto.n_contexts,
+            "context_labels": proto.context_labels,
+            "context_signs": proto.context_signs,
+            "verified": not args.no_verify,
+            "script_written_to": args.out,
+            "script_chars": len(proto.script),
+        }, indent=2))
+
+    elif args.command == "spectrum":
+        s = spectrum_summary(args.d)
+        print(json.dumps({
+            "modulus": s.modulus,
+            "is_even": s.is_even,
+            "achievable_values": s.achievable_values,
+            "nonzero_value": s.nonzero_value,
+            "value_order": s.value_order,
+            "two_primary": s.two_primary.is_two_primary,
+            "shadow_value_faithful": s.two_primary.shadow_value_faithful,
+            "reason": s.reason,
         }, indent=2))
 
     elif args.command == "rewrite-policies":

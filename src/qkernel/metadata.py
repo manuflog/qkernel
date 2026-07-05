@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-QKERNEL_VERSION = "0.33.0"
+QKERNEL_VERSION = "0.37.0"
 
 COORDINATE_CONVENTION = {
     "id": "interleaved_zx_v1",

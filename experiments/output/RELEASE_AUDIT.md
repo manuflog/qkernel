@@ -1,6 +1,6 @@
 # Q-Kernel Release Audit
 
-- version: `0.33.0`
+- version: `0.37.0`
 - passed: `True`
 - recommendation: ready for private/public-review repository; keep alpha label and conservative README positioning
 

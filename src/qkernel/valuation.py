@@ -230,3 +230,122 @@ def check_kernel_zd_valuation(program: WeylProgram, kernel: KernelResult) -> ZDV
 
     sub = selected_subprogram(program, kernel.selected_contexts)
     return check_zd_valuation(sub)
+
+
+@dataclass(frozen=True)
+class TwoPrimaryReport:
+    """Report on the 2-primary structure of the achievable obstruction value.
+
+    Corollary (deductive from the Obstruction Spectrum Theorem, H(d) = {0, d/2}
+    for even d): write d = 2^k * m with m odd. Under the CRT isomorphism
+    Z_d ~= Z_{2^k} x Z_m, the value d/2 = 2^{k-1} m maps to
+    (2^{k-1} m mod 2^k, 0): it is the order-two element of the 2-primary factor
+    and is identically zero in the odd factor Z_m, for every even d. Hence any
+    achievable Weyl obstruction value is 2-primary, and the mod-2 carry shadow
+    detects the full obstruction *value* at every even d -- not only 2-power
+    dimensions. (This concerns the value; incidence-minimality can still require
+    a Z_d cycle search.)
+    """
+
+    modulus: int
+    two_adic_valuation: int
+    odd_part: int
+    value_dover2: int
+    value_odd_component: int
+    is_two_primary: bool
+    shadow_value_faithful: bool
+    reason: str
+
+
+def two_primary_report(modulus: int) -> TwoPrimaryReport:
+    """Return the 2-primary / value-faithfulness report for local dimension d."""
+    d = int(modulus)
+    if d <= 0:
+        raise ValueError("modulus must be positive")
+    m = d
+    k = 0
+    while m % 2 == 0:
+        m //= 2
+        k += 1
+    if k == 0:
+        return TwoPrimaryReport(
+            modulus=d,
+            two_adic_valuation=0,
+            odd_part=m,
+            value_dover2=0,
+            value_odd_component=0,
+            is_two_primary=True,
+            shadow_value_faithful=True,
+            reason="odd d: H(d) = {0}; no obstruction, shadow trivially value-faithful",
+        )
+    half = d // 2
+    odd_component = half % m  # image of d/2 in the odd factor Z_m
+    is_two_primary = odd_component == 0
+    return TwoPrimaryReport(
+        modulus=d,
+        two_adic_valuation=k,
+        odd_part=m,
+        value_dover2=half,
+        value_odd_component=odd_component,
+        is_two_primary=is_two_primary,
+        shadow_value_faithful=is_two_primary,
+        reason=(
+            "even d = 2^%d * %d: value d/2 = %d is 2-primary "
+            "(odd-part component %d); mod-2 shadow is value-faithful"
+            % (k, m, half, odd_component)
+        ),
+    )
+
+
+@dataclass(frozen=True)
+class SpectrumSummary:
+    """One-call summary of the obstruction spectrum at local dimension d.
+
+    Encodes the Obstruction Spectrum Theorem H(d) = {0, d/2} for even d (and
+    H(d) = {0} for odd d), together with the 2-primary structure of the nonzero
+    value. This is a pure dimension-level lookup: it depends only on d, not on
+    any particular measurement program.
+    """
+
+    modulus: int
+    is_even: bool
+    achievable_values: list[int]
+    nonzero_value: int | None
+    value_order: int | None
+    two_primary: TwoPrimaryReport
+    reason: str
+
+
+def spectrum_summary(modulus: int) -> SpectrumSummary:
+    """Return the obstruction spectrum summary for local dimension d."""
+    d = int(modulus)
+    if d <= 1:
+        raise ValueError("modulus must be >= 2")
+    tp = two_primary_report(d)
+    if d % 2 == 1:
+        return SpectrumSummary(
+            modulus=d,
+            is_even=False,
+            achievable_values=[0],
+            nonzero_value=None,
+            value_order=None,
+            two_primary=tp,
+            reason=(
+                "odd d: H(d) = {0}; odd-dimensional Weyl stabilizer families are "
+                "noncontextual (no state-independent parity obstruction)"
+            ),
+        )
+    half = d // 2
+    # order of d/2 in Z_d: d / gcd(d, d/2) = d / (d/2) = 2
+    return SpectrumSummary(
+        modulus=d,
+        is_even=True,
+        achievable_values=[0, half],
+        nonzero_value=half,
+        value_order=2,
+        two_primary=tp,
+        reason=(
+            "even d: H(d) = {0, d/2}; the nonzero value d/2 is the order-two "
+            "element of Z_d and is 2-primary (mod-2 shadow value-faithful)"
+        ),
+    )
