@@ -24,7 +24,7 @@ classifiers = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
-sat = ["python-sat[pblib,aiger]>=1.8.dev0"]
+sat = ["python-sat[pblib,aiger]>=1.9.dev5"]
 
 [project.scripts]
 qkernel = "qkernel.cli:main"
