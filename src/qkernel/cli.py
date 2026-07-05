@@ -102,6 +102,23 @@ def main() -> None:
     compress_cmd.add_argument("--json", action="store_true", help="print JSON certificate")
     _add_solver_args(compress_cmd)
 
+    enum_cmd = sub.add_parser(
+        "enumerate-kernels",
+        help="count all distinct minimal odd-Q kernels (contextuality-structure invariant)",
+    )
+    enum_cmd.add_argument("path")
+    enum_cmd.add_argument("--max-cycle-dim", type=int, default=20)
+
+    activation_cmd = sub.add_parser("activation", help="check contextuality activation by d->2d embedding of a Weyl base")
+    activation_cmd.add_argument("path")
+
+    mintest_cmd = sub.add_parser("minimal-test", help="cheapest contextuality test from a device's measurable Paulis")
+    mintest_cmd.add_argument("paulis", nargs="+", help="measurable Pauli strings, e.g. XI IX XX IY YI YY XY YX ZZ")
+    mintest_cmd.add_argument("--top", type=int, default=1)
+
+    actres_cmd = sub.add_parser("activation-resource", help="cheapest contextuality test activated by d->2d embedding of a non-contextual Weyl base")
+    actres_cmd.add_argument("path")
+
     analyze_pauli_cmd = sub.add_parser("analyze-pauli", help="detect odd-Q contextuality in Pauli-context JSON")
     analyze_pauli_cmd.add_argument("path")
 
@@ -309,6 +326,52 @@ def main() -> None:
 
     elif args.command == "analyze":
         _print_analysis(analyze(load_program(args.path)))
+
+    elif args.command == "enumerate-kernels":
+        from .solvers import find_all_min_odd_cycles, hamming_weight
+
+        program = load_program(args.path)
+        try:
+            cycles = find_all_min_odd_cycles(program, max_cycle_dim=args.max_cycle_dim)
+        except ValueError as exc:
+            print(f"cannot enumerate: {exc}")
+            return 0
+        if not cycles:
+            print("non-contextual: no odd-Q kernel.")
+        else:
+            w = hamming_weight(cycles[0])
+            print(f"{len(cycles)} distinct minimal odd-Q kernel(s), each of weight {w}.")
+            for i, lam in enumerate(cycles):
+                sel = [j for j, bit in enumerate(lam) if bit]
+                print(f"  kernel {i + 1}: contexts {sel}")
+
+    elif args.command == "activation":
+        from .embedding import activation_report
+        r = activation_report(load_program(args.path))
+        print(f"base d={r.base_d}: contextual={r.base_contextual} ({r.base_contexts} contexts)")
+        print(f"fiber d={r.fiber_d}: contextual={r.fiber_contextual} ({r.fiber_contexts} contexts)")
+        print(f"activated={r.activated} -- {r.reason}")
+
+    elif args.command == "minimal-test":
+        from .experiment_design import minimal_contextuality_tests
+        tests = minimal_contextuality_tests(args.paulis, top=args.top)
+        if not tests:
+            print("no contextuality test: the measurable set is non-contextual.")
+        else:
+            print(f"{len(tests)} cheapest test(s); each {tests[0].n_contexts} settings, {tests[0].n_observables} observables.")
+            for k, t in enumerate(tests):
+                print(f"  test {k+1} (value d/2 = {t.obstruction_value}, verified={t.verified}):")
+                for ctx in t.contexts:
+                    print(f"    measure together: {ctx}")
+
+    elif args.command == "activation-resource":
+        from .embedding import activated_resource
+        r = activated_resource(load_program(args.path))
+        if not r.activated:
+            print(f"not activated: {r.reason}")
+        else:
+            print(f"activated: base d={r.base_d} (non-contextual) -> fiber d={r.fiber_d} (contextual).")
+            print(f"cheapest activated test: {r.test_weight} settings, value d/2={r.obstruction_value}, verified={r.verified}")
 
     elif args.command == "compress":
         _compress(load_program(args.path), args)

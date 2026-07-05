@@ -41,31 +41,65 @@ def analyze(program: WeylProgram) -> AnalysisResult:
     b = b_vector(program)
     cycle_basis = left_kernel_basis(program)
 
-    for lam in span(cycle_basis):
-        q_carry = q_from_context_carries(program, lam)
-        q_closed = q_from_observable_multiset(program, lam)
+    # For a tractable cycle space, enumerate the span: this finds a minimal odd
+    # cycle and cross-checks q_carry == q_closed on every cycle.
+    ENUM_LIMIT = 20
+    if len(cycle_basis) <= ENUM_LIMIT:
+        for lam in span(cycle_basis):
+            q_carry = q_from_context_carries(program, lam)
+            q_closed = q_from_observable_multiset(program, lam)
 
-        if q_carry != q_closed:
-            raise AssertionError("internal check failed: lambda·b != closed symplectic Q(lambda).")
+            if q_carry != q_closed:
+                raise AssertionError("internal check failed: lambda·b != closed symplectic Q(lambda).")
 
-        if q_closed == 1:
-            selected = [i for i, bit in enumerate(lam) if bit]
-            return AnalysisResult(
-                contextual=True,
-                reason="odd-Q cycle found",
-                b_vector=b,
-                cycle_basis=cycle_basis,
-                odd_cycle=lam,
-                q_value=q_closed,
-                selected_contexts=selected,
-            )
+            if q_closed == 1:
+                selected = [i for i, bit in enumerate(lam) if bit]
+                return AnalysisResult(
+                    contextual=True,
+                    reason="odd-Q cycle found",
+                    b_vector=b,
+                    cycle_basis=cycle_basis,
+                    odd_cycle=lam,
+                    q_value=q_closed,
+                    selected_contexts=selected,
+                )
 
+        return AnalysisResult(
+            contextual=False,
+            reason="no odd-Q cycle found",
+            b_vector=b,
+            cycle_basis=cycle_basis,
+            odd_cycle=None,
+            q_value=None,
+            selected_contexts=[],
+        )
+
+    # High cycle dimension: exhaustive span enumeration (2^dim) is infeasible.
+    # The odd-Q criterion is linear in lambda (Theorem Q: q_closed = lambda·b),
+    # so contextuality is decided exactly by whether any basis cycle carries odd
+    # b; a low-weight witness is then obtained by the heuristic solver.
+    contextual = any(sum(x * y for x, y in zip(k, b)) % 2 for k in cycle_basis)
+    if not contextual:
+        return AnalysisResult(
+            contextual=False,
+            reason="no odd-Q cycle (high cycle-dim; decided by odd-carry parity)",
+            b_vector=b,
+            cycle_basis=cycle_basis,
+            odd_cycle=None,
+            q_value=None,
+            selected_contexts=[],
+        )
+
+    from .solvers import find_min_odd_cycle_heuristic
+
+    lam = find_min_odd_cycle_heuristic(program)
+    selected = [i for i, bit in enumerate(lam) if bit] if lam else []
     return AnalysisResult(
-        contextual=False,
-        reason="no odd-Q cycle found",
+        contextual=True,
+        reason="odd-Q cycle found (high cycle-dim; heuristic witness)",
         b_vector=b,
         cycle_basis=cycle_basis,
-        odd_cycle=None,
-        q_value=None,
-        selected_contexts=[],
+        odd_cycle=lam,
+        q_value=1,
+        selected_contexts=selected,
     )

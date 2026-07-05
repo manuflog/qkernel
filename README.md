@@ -36,8 +36,15 @@ A narrow, testable compiler-analysis backend:
 - compute commutator-carry bits $b(C)$;
 - build the context-observable incidence matrix $A$;
 - find parity cycles $A^T\lambda=0$;
-- detect odd-$Q$ contextuality;
-- compress a large program to a minimal odd-$Q$ certificate.
+- detect odd-$Q$ contextuality (polynomial decision, never enumerates);
+- compress a large program to a minimal odd-$Q$ certificate, via five solver backends
+  (span / bounded-weight / branch-bound / heuristic / CP-SAT) — the heuristic scales past
+  cycle-dimension 5000, and CP-SAT *certifies* minimality where enumeration is infeasible;
+- enumerate **all** minimal kernels (contextuality-structure invariant);
+- expose all of the above as one composable **subroutine** for pipeline integration
+  (`qkernel.subroutine`), with two applications built on it: cheapest-contextuality-test
+  **experiment design** (`minimal-test`) and **activation-by-embedding** as resource
+  generation (`activation`, `activation-resource`).
 
 ## What this is not yet
 
@@ -54,12 +61,18 @@ pip install -e ".[dev]"
 ```bash
 qkernel analyze examples/peres_mermin.json
 qkernel compress examples/noisy_pm.json
+qkernel enumerate-kernels examples/peres_mermin.json          # all minimal kernels
+qkernel minimal-test XI IX XX IY YI YY XY YX ZZ               # cheapest test from device Paulis
+qkernel activation examples/activation_base_d4.json           # does d->2d embedding activate?
+qkernel activation-resource examples/activation_base_d4.json  # cheapest activated test
 ```
 
 Expected behavior:
 
 - `peres_mermin.json` is contextual;
-- `noisy_pm.json` compresses many irrelevant contexts to the six-context Peres-Mermin kernel.
+- `noisy_pm.json` compresses many irrelevant contexts to the six-context Peres-Mermin kernel;
+- the nine Peres-Mermin Paulis yield exactly one cheapest test (the PM square); all 15 two-qubit
+  Paulis yield the 10 Mermin squares of the doily.
 
 ## Python API
 
@@ -75,6 +88,32 @@ kernel = compress_min_odd_q(program)
 print(result.contextual)
 print(kernel.selected_contexts)
 ```
+
+## Composable subroutine and applications
+
+Q-Kernel exposes contextuality analysis as a single composable **subroutine** — the natural
+unit at which a host quantum-compilation / resource-estimation loop measures the value of the
+contextuality step (see [`docs/SUBROUTINE.md`](docs/SUBROUTINE.md)):
+
+```python
+from qkernel.subroutine import analyze_contextuality
+
+r = analyze_contextuality(program, enumerate_all_kernels=True, certify_minimal=True)
+# r.contextual, r.min_kernel_contexts, r.kernel_weight, r.verified,
+# r.certified_minimal (CP-SAT), r.n_minimal_kernels, r.obstruction_value
+```
+
+Two applications are built on it:
+
+- **Experiment design** (`qkernel.experiment_design`, `minimal-test` CLI): given a device's
+  measurable Paulis, return the cheapest state-independent contextuality test(s) as concrete
+  measurement settings, ranked by fewest settings then fewest observables.
+- **Activation by embedding** (`qkernel.embedding`, `activation` / `activation-resource` CLI):
+  a non-contextual base can become contextual under passive `d -> 2d` embedding (the *fiber
+  pool*); the yield reproduces the verified research curve and falls sharply with base dimension.
+  See [`docs/ACTIVATION.md`](docs/ACTIVATION.md).
+
+This is classical analysis (no quantum speedup is claimed); the design value is composability.
 
 ## Core theorem implemented
 
@@ -102,12 +141,16 @@ The key implementation rule is:
 
 ## Roadmap
 
-1. Core library and CLI.
-2. Certificate renderer.
-3. Qiskit / Stim / Pauli-string adapters.
-4. Minimum-weight odd-$Q$ optimization beyond brute-force cycle enumeration.
-5. Resource-estimator experiments comparing kernel features to T-count, T-depth, magic injections, and stabilizer rank.
-6. Qudit-specific demos for even $d=4,6,8$.
+1. Core library and CLI. **done**
+2. Certificate renderer. **done**
+3. Qiskit / Stim / Pauli-string adapters. **done** (Stim adapter cross-validated against real Stim v1.16)
+4. Minimum-weight odd-$Q$ optimization beyond brute-force enumeration. **done** — five backends
+   (span / bounded-weight / branch-bound / heuristic / CP-SAT); the heuristic scales past cycle-dim 5000
+   and CP-SAT *certifies* minimality where enumeration is infeasible. See [`docs/SOLVERS.md`](docs/SOLVERS.md).
+5. Resource-estimator experiments (kernel features vs T-count, magic, stabilizer rank). **open** — needs an external resource oracle.
+6. Qudit demos for even $d=4,6,8$. **done** — obstruction spectrum $H(d)=\{0,d/2\}$, 2-primary tower, and d→2d activation.
+
+See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the phase-by-phase status (Phases 1–3 complete, Phase 4 applications delivered).
 
 
 ## Pauli frontend

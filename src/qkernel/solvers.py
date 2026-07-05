@@ -9,7 +9,7 @@ from .incidence import build_incidence, left_kernel_basis
 from .ir import WeylProgram
 
 
-SolverName = Literal["auto", "span", "bounded-weight", "branch-bound"]
+SolverName = Literal["auto", "span", "bounded-weight", "branch-bound", "heuristic", "cpsat"]
 
 
 def hamming_weight(vec: list[int]) -> int:
@@ -245,6 +245,15 @@ def find_min_odd_cycle(
             initial_max_weight=max_weight + 1 if max_weight else None,
         )
 
+    if solver == "heuristic":
+        return find_min_odd_cycle_heuristic(program)
+
+    if solver == "cpsat":
+        from .solvers_milp import find_min_odd_cycle_cpsat
+
+        cycle, _certified = find_min_odd_cycle_cpsat(program)
+        return cycle
+
     if solver != "auto":
         raise ValueError(f"unknown solver {solver!r}.")
 
@@ -252,16 +261,149 @@ def find_min_odd_cycle(
     if len(basis) <= max_cycle_dim:
         return find_min_odd_cycle_span(program, max_cycle_dim=max_cycle_dim)
 
-    # Try exact bounded search for small certificates, then branch-bound.
-    candidate = find_min_odd_cycle_bounded_weight(
-        program,
-        max_weight=max_weight,
-        max_checks=max_checks,
-    )
-    if candidate is not None:
-        return candidate
+    # Try exact bounded search for small certificates, then branch-bound. On a
+    # high cycle-dimension family these can exhaust their budget (returning None
+    # or raising); in that case fall back to the polynomial-time sparse-cycle
+    # heuristic rather than failing.
+    try:
+        candidate = find_min_odd_cycle_bounded_weight(
+            program,
+            max_weight=max_weight,
+            max_checks=max_checks,
+        )
+        if candidate is not None:
+            return candidate
+    except RuntimeError:
+        pass
 
-    return find_min_odd_cycle_branch_bound(
-        program,
-        max_nodes=max_nodes,
-    )
+    try:
+        candidate = find_min_odd_cycle_branch_bound(
+            program,
+            max_nodes=max_nodes,
+        )
+        if candidate is not None:
+            return candidate
+    except RuntimeError:
+        pass
+
+    return find_min_odd_cycle_heuristic(program)
+
+
+# --- sparse-cycle heuristic (Phase 3): scales past exact enumeration ---
+
+def _popcount(x: int) -> int:
+    return bin(x).count("1")
+
+
+def find_min_odd_cycle_heuristic(
+    program: WeylProgram,
+    *,
+    restarts: int = 12,
+    seed: int = 0,
+) -> list[int] | None:
+    """Heuristic minimum odd-Q cycle by minimum-weight coset-leader local search.
+
+    The odd cycles form an affine coset ``c0 + <even cycles>`` in the GF(2) cycle
+    space. Starting from an odd representative, we greedily XOR even-cycle basis
+    directions whenever that lowers the Hamming weight, with randomized restarts to
+    escape local minima. This is polynomial per restart (no ``2^dim`` span
+    enumeration), so it scales to large families where the exact solvers time out.
+    Returns a low-weight odd cycle, or ``None`` if the family is non-contextual.
+    """
+    import random
+
+    basis = left_kernel_basis(program)
+    if not basis:
+        return None
+    b = b_vector(program)
+    n = len(program.contexts)
+
+    def to_bits(vec: list[int]) -> int:
+        x = 0
+        for i, v in enumerate(vec):
+            if v & 1:
+                x |= 1 << i
+        return x
+
+    def b_dot(x: int) -> int:
+        s = 0
+        xx = x
+        while xx:
+            low = xx & (-xx)          # isolate lowest set bit
+            s ^= b[low.bit_length() - 1]
+            xx ^= low                 # clear that same bit
+        return s & 1
+
+    basis_bits = [to_bits(k) for k in basis]
+    odd = [k for k in basis_bits if b_dot(k) == 1]
+    if not odd:
+        return None  # cycle space has no odd element => non-contextual
+
+    c0 = odd[0]
+    even_dirs = [k for k in basis_bits if b_dot(k) == 0]
+    even_dirs += [k ^ c0 for k in odd[1:]]
+
+    rng = random.Random(seed)
+
+    def descend(start: int) -> int:
+        cur = start
+        improved = True
+        while improved:
+            improved = False
+            order = list(even_dirs)
+            rng.shuffle(order)
+            for d in order:
+                cand = cur ^ d
+                if _popcount(cand) < _popcount(cur):
+                    cur = cand
+                    improved = True
+        return cur
+
+    best = descend(c0)
+    best_w = _popcount(best)
+    for _ in range(max(0, restarts - 1)):
+        # random restart: perturb c0 by a random subset of even directions
+        pert = c0
+        for d in even_dirs:
+            if rng.random() < 0.5:
+                pert ^= d
+        cand = descend(pert)
+        if _popcount(cand) < best_w:
+            best, best_w = cand, _popcount(cand)
+
+    return [(best >> i) & 1 for i in range(n)]
+
+
+def find_all_min_odd_cycles(
+    program: WeylProgram,
+    *,
+    max_cycle_dim: int = 20,
+) -> list[list[int]]:
+    """All minimum-weight odd-Q cycles (all minimal contextual kernels).
+
+    Reveals the structure of contextuality in a family: how many distinct minimal
+    witnesses it carries. Exact for tractable cycle spaces (enumerates the span and
+    keeps every cycle attaining the minimum odd weight); returns ``[]`` for
+    non-contextual families. For cycle spaces beyond ``max_cycle_dim`` a ValueError
+    is raised (the span cannot be enumerated); use the heuristic for a single
+    witness there.
+    """
+    basis = left_kernel_basis(program)
+    if len(basis) > max_cycle_dim:
+        raise ValueError(
+            f"cycle dimension {len(basis)} exceeds max_cycle_dim={max_cycle_dim}; "
+            "exhaustive enumeration of all minimal kernels is infeasible."
+        )
+    b = b_vector(program)
+    best_weight: int | None = None
+    winners: list[list[int]] = []
+    for lam in span(basis):
+        if sum(x * y for x, y in zip(lam, b)) % 2 != 1:
+            continue
+        w = hamming_weight(lam)
+        if best_weight is None or w < best_weight:
+            best_weight = w
+            winners = [lam]
+        elif w == best_weight:
+            winners.append(lam)
+    return winners

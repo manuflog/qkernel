@@ -1,4 +1,38 @@
 # Changelog
+
+## [0.38.0] - 2026-07-05
+### Added
+- Activation as resource generation (`qkernel.embedding.activated_resource`, `activation-resource` CLI):
+  extracts the cheapest contextuality test activated by d->2d embedding of a non-contextual base, verified
+  on the odd-Q criterion (consistent with the activation definition; not the stricter Z_d verifier).
+- Stim interoperability check (`tests/test_stim_oracle.py`, optional `[stim]` extra): cross-validates the
+  stim-lite adapter and qkernel's Pauli algebra against real Stim (v1.16+) as an independent oracle --
+  Stim parses the .stim examples and confirms every context pairwise-commutes and products to +/-I.
+- Experiment-design layer (`qkernel.experiment_design`): given a device's measurable Paulis, returns
+  the cheapest state-independent contextuality test(s) as concrete measurement settings, ranked by
+  fewest settings then fewest observables. New `minimal-test` CLI command.
+- Composable **contextuality subroutine** (`qkernel.subroutine.analyze_contextuality`): one stable-
+  contract call returning the decision, the minimal certificate, independent verification, optional
+  CP-SAT certified-minimality and minimal-kernel count, and the obstruction value -- designed to plug
+  into a larger quantum-compilation / resource-estimation loop (subroutine-oriented design). See docs/SUBROUTINE.md.
+- CP-SAT exact backend (`qkernel.solvers_milp`, optional OR-Tools): independent integer-programming
+  solver, `solver="cpsat"`. Cross-validates the native solvers and **certifies** minimality on
+  high-cycle-dimension families where exhaustive span enumeration is infeasible (m=3, cycle_dim 259).
+- Contextuality **activation by dimension embedding** (`qkernel.embedding`): `build_fiber_pool`
+  (d->2d fiber pool) and `activation_report`; a non-contextual base can become contextual under
+  passive embedding. New `activation` CLI command; example `activation_base_d4.json`. Reproduces the
+  verified research activation-yield curve exactly.
+- Sparse-cycle heuristic solver (`find_min_odd_cycle_heuristic`): minimum-weight coset-leader local
+  search; scales to cycle-dimension >5000 where exact span enumeration is infeasible. Selectable via
+  `find_min_odd_cycle(solver="heuristic")`; `analyze` and `compress_min_odd_q` auto-fall-back to it.
+- `find_all_min_odd_cycles`: enumerates all distinct minimal contextual kernels (reproduces the 10
+  Mermin squares of the two-qubit doily). New `enumerate-kernels` CLI command.
+- Benchmark suite (`experiments/benchmark_suite.py`) and dense-Pauli generator
+  (`experiments/dense_pauli.py`) for solver scaling and the exact-vs-heuristic crossover.
+### Fixed
+- `analyze` no longer raises on high cycle-dimension families; contextuality is decided by odd-carry
+  parity (exact) with a heuristic witness.
+
 ## [0.37.0] - 2026-07-05
 
 ### Repo hygiene (public-release prep)
