@@ -1,0 +1,13 @@
+{
+  "type": "qiskit_pauli_layers",
+  "qubit_order": "qkernel",
+  "description": "Candidate compiler-pass output: same Peres-Mermin diagnostic core after removing disconnected nonkernel checks. This file is not a semantic proof.",
+  "layers": [
+    {"name": "pm_row_0", "paulis": ["ZIII", "IZII", "ZZII"]},
+    {"name": "pm_row_1", "paulis": ["IXII", "XIII", "XXII"]},
+    {"name": "pm_row_2", "paulis": ["ZXII", "XZII", "YYII"]},
+    {"name": "pm_col_0", "paulis": ["ZIII", "IXII", "ZXII"]},
+    {"name": "pm_col_1", "paulis": ["IZII", "XIII", "XZII"]},
+    {"name": "pm_col_2", "paulis": ["ZZII", "XXII", "YYII"]}
+  ]
+}

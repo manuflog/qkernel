@@ -1,0 +1,28 @@
+{
+  "d": 4,
+  "m": 1,
+  "context_phases": [
+    0,
+    2
+  ],
+  "observables": {
+    "A": [
+      1,
+      0
+    ],
+    "A_inv": [
+      3,
+      0
+    ]
+  },
+  "contexts": [
+    [
+      "A",
+      "A_inv"
+    ],
+    [
+      "A",
+      "A_inv"
+    ]
+  ]
+}

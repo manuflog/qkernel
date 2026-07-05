@@ -1,0 +1,5 @@
+# Non-MPP operations are ignored in loose mode.
+H 0
+CX 0 1
+TICK
+MPP Z0 Z1 Z0*Z1

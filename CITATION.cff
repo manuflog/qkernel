@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use Q-Kernel, please cite the software note and repository."
+title: "Q-Kernel: Exact Odd-Q Contextuality Kernel Extraction for Weyl/Pauli Measurement Programs"
+authors:
+  - family-names: "Flores Gordillo"
+    given-names: "Manuel"
+    email: "manuel.flores@columbia.edu"
+    orcid: "https://orcid.org/0009-0006-8246-0343"
+version: "0.37.0"
+date-released: "2026-07-05"
+license: "Apache-2.0"
+repository-code: "https://github.com/manuflog/qkernel"
+keywords:
+  - quantum contextuality
+  - Weyl operators
+  - Pauli operators
+  - compiler analysis
+  - SAT
+  - MaxSAT
