@@ -1,3 +1,5 @@
+import pytest
+pytest.importorskip("pysat")
 from pathlib import Path
 import importlib.util
 

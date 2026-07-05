@@ -1,3 +1,5 @@
+import pytest
+pytest.importorskip("qiskit")
 from pathlib import Path
 
 from qkernel.adapters.qiskit_lite import (

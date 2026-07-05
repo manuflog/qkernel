@@ -1,3 +1,5 @@
+import pytest
+pytest.importorskip("qiskit")
 import json
 import subprocess
 import sys

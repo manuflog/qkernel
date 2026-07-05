@@ -1,3 +1,5 @@
+import pytest
+pytest.importorskip("qiskit")
 import json
 
 from qkernel.cli import main

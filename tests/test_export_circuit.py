@@ -6,6 +6,7 @@ re-introducing the algebraically-pinned single-joint-measurement (which returns
 the ideal value on any data and certifies nothing).
 """
 import pytest
+pytest.importorskip("qiskit")
 
 from qkernel.examples import peres_mermin_program
 from qkernel.export_circuit import export_qiskit_protocol, vector_to_pauli_label
