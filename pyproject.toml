@@ -12,7 +12,7 @@ requires-python = ">=3.10"
 authors = [
   { name = "Manuel Flores Gordillo", email = "m.flores.gordillo@gmail.com" }
 ]
-dependencies = ["sympy>=1.12"]
+dependencies = ["sympy>=1.14.0"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Science/Research",
