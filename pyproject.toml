@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "qkernel"
-version = "0.41.0"
+version = "0.42.0"
 description = "Contextuality kernel extraction for Weyl/Pauli measurement programs"
 license = { text = "Apache-2.0" }
 readme = "README.md"
