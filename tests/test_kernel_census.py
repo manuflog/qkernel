@@ -1,0 +1,47 @@
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+from qkernel.kernel_census import kernel_census_report_dict
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_kernel_census_pins_known_zoo_weights():
+    data = kernel_census_report_dict()
+    by_name = {entry["name"]: entry for entry in data["entries"]}
+
+    assert data["schema"] == "qkernel.kernel_census.v1"
+    assert by_name["peres_mermin"]["kernel_weight"] == 6
+    assert by_name["doily_two_qubit"]["n_minimal_kernels"] == 10
+    assert by_name["cert4_d4"]["d"] == 4
+    assert by_name["cert4_d4"]["kernel_weight"] == 6
+    assert by_name["single_context"]["contextual"] is False
+    assert "does not prove global K(d,m) lower bounds" in data["non_claims"]
+    json.dumps(data)
+
+
+def test_kernel_census_summaries_are_witness_scoped():
+    data = kernel_census_report_dict()
+    summaries = {(s["d"], s["m"]): s for s in data["summaries"]}
+
+    assert summaries[(2, 2)]["witnessed_min_kernel_weight"] == 6
+    assert "peres_mermin" in summaries[(2, 2)]["witness_names"]
+    assert summaries[(4, 2)]["witnessed_min_kernel_weight"] == 6
+    assert "not a proof of global K(d,m)" in summaries[(4, 2)]["claim_scope"]
+
+
+def test_cli_kernel_census_contextual_only():
+    proc = subprocess.run(
+        [sys.executable, "-m", "qkernel.cli", "kernel-census", "--contextual-only"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    data = json.loads(proc.stdout)
+    assert data["entries"]
+    assert all(entry["contextual"] for entry in data["entries"])

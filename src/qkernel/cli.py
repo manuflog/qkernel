@@ -26,6 +26,7 @@ from .release_audit import run_release_audit, release_audit_dict, write_release_
 from .github_ready import run_github_ready_check, github_ready_report_dict, write_github_ready_report
 from .backends.pysat_backend import OptionalBackendUnavailable, solve_sat_with_pysat, solve_maxsat_with_rc2
 from .compiler import compiler_report_dict, compare_compiler_pass_dict
+from .kernel_census import kernel_census_report_dict
 from .selftest import run_selftest_dict
 from .rewrite_policy import list_rewrite_policies_dict, assess_rewrite_candidate_dict
 from .valuation import check_zd_valuation, check_kernel_zd_valuation, two_primary_report, spectrum_summary
@@ -129,6 +130,9 @@ def main() -> None:
     )
     enum_cmd.add_argument("path")
     enum_cmd.add_argument("--max-cycle-dim", type=int, default=20)
+
+    census_cmd = sub.add_parser("kernel-census", help="run conservative minimal-kernel census over benchmark zoo")
+    census_cmd.add_argument("--contextual-only", action="store_true", help="omit non-contextual control instances")
 
     activation_cmd = sub.add_parser("activation", help="check contextuality activation by d->2d embedding of a Weyl base")
     activation_cmd.add_argument("path")
@@ -414,6 +418,12 @@ def main() -> None:
             for i, lam in enumerate(cycles):
                 sel = [j for j, bit in enumerate(lam) if bit]
                 print(f"  kernel {i + 1}: contexts {sel}")
+
+    elif args.command == "kernel-census":
+        print(json.dumps(
+            kernel_census_report_dict(include_noncontextual=not args.contextual_only),
+            indent=2,
+        ))
 
     elif args.command == "activation":
         from .embedding import activation_report
