@@ -1,19 +1,26 @@
 cff-version: 1.2.0
-message: "If you use Q-Kernel, please cite the software note and repository."
-title: "Q-Kernel: Exact Odd-Q Contextuality Kernel Extraction for Weyl/Pauli Measurement Programs"
+message: "If you use qkernel in research, please cite it as below."
+title: "Q-Kernel: exact odd-Q contextuality kernels for Weyl/Pauli measurement families"
+type: software
 authors:
   - family-names: "Flores Gordillo"
     given-names: "Manuel"
-    email: "manuel.flores@columbia.edu"
     orcid: "https://orcid.org/0009-0006-8246-0343"
-version: "0.37.0"
-date-released: "2026-07-05"
-license: "Apache-2.0"
+version: 0.43.0
+date-released: 2026-07-06
 repository-code: "https://github.com/manuflog/qkernel"
+license: Apache-2.0
 keywords:
   - quantum contextuality
-  - Weyl operators
-  - Pauli operators
-  - compiler analysis
-  - SAT
-  - MaxSAT
+  - Kochen-Specker
+  - Peres-Mermin
+  - Weyl-Heisenberg
+  - GF(2) cycle space
+  - certification
+abstract: >-
+  Q-Kernel validates Weyl/Pauli measurement families, decides state-independent
+  odd-Q contextuality, compresses to minimal verified kernels (with independent
+  Z_d/AvN valuation hardening and optional CP-SAT minimality certification),
+  designs cheapest and backend-aware contextuality experiments, and records
+  hardware results in a schema-validated registry. Every user-facing result
+  carries a machine-readable criterion ledger declaring its claim scope.

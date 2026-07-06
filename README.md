@@ -14,6 +14,29 @@
 > the verifier used, the claim scope, and whether the stronger verifier passed. See
 > [`ALPHA_README.md`](ALPHA_README.md) for the full positioning.
 
+## Theory-to-hardware artifact pipeline (v0.39–v0.43)
+
+Q-Kernel is a research artifact with a complete, criterion-disciplined bridge
+from theory to measured hardware results:
+
+1. **Decide & certify** — `analyze_contextuality`: odd-Q verdict, minimal
+   kernel, independent re-verification (odd-Q + Z_d/AvN), optional CP-SAT
+   minimality proof. Every result carries a `criterion_ledger` (v0.39).
+2. **Design** — `minimal_contextuality_tests` (cheapest settings) and
+   `backend_design.backend_aware_tests` (ranked by expected significance and
+   shots-to-certify under a per-qubit readout-noise model; v0.40).
+3. **Pin** — `zoo.run_zoo()`: curated instances with expected verdicts per
+   criterion, enforced by the test suite as a permanent regression harness
+   (v0.41).
+4. **Run** — `export_circuit.export_qiskit_protocol`: sequential
+   non-destructive measurement protocol (avoids the pinned-statistic pitfall).
+5. **Record** — `hardware_registry`: schema-validated JSONL records linking
+   prediction, per-context counts, and the computed verdict (S, z above the
+   noncontextual bound, certified at k sigma; v0.42).
+
+Cite via `CITATION.cff` (v0.43).
+
+
 > **Part of a larger program.** Q-Kernel is the software component of a research program on
 > contextuality as cohomological obstructions. Papers, machine-checkable verifications, and hardware
 > results: [`manuflog/contextuality-obstructions`](https://github.com/manuflog/contextuality-obstructions).
