@@ -56,11 +56,24 @@ class KernelTheoremPin:
 
 
 @dataclass(frozen=True)
+class KernelTheoremPinAudit:
+    d: int
+    m: int
+    K: int
+    theorem_id: str
+    status: str
+    witnessed_min_kernel_weight: int | None
+    witness_names: list[str]
+    detail: str
+
+
+@dataclass(frozen=True)
 class KernelCensusReport:
     schema: str
     entries: list[CensusEntry]
     summaries: list[CensusSummary]
     theorem_pins: list[KernelTheoremPin]
+    theorem_pin_audits: list[KernelTheoremPinAudit]
     claim_scope: str
     non_claims: list[str]
 
@@ -173,10 +186,10 @@ def load_kernel_theorem_pins(path: str | Path) -> list[KernelTheoremPin]:
     return pins
 
 
-def _validate_theorem_pins_against_entries(
+def _audit_theorem_pins_against_entries(
     pins: list[KernelTheoremPin],
     entries: list[CensusEntry],
-) -> None:
+) -> list[KernelTheoremPinAudit]:
     witnessed: dict[tuple[int, int], tuple[int, list[str]]] = {}
     for entry in entries:
         if not entry.contextual or entry.kernel_weight is None:
@@ -187,16 +200,54 @@ def _validate_theorem_pins_against_entries(
         elif entry.kernel_weight == witnessed[key][0]:
             witnessed[key][1].append(entry.name)
 
+    audits: list[KernelTheoremPinAudit] = []
     for pin in pins:
         witness = witnessed.get((pin.d, pin.m))
         if witness is None:
+            audits.append(KernelTheoremPinAudit(
+                d=pin.d,
+                m=pin.m,
+                K=pin.K,
+                theorem_id=pin.theorem_id,
+                status="no_registered_witness",
+                witnessed_min_kernel_weight=None,
+                witness_names=[],
+                detail=(
+                    f"no contextual zoo witness is registered for d={pin.d}, m={pin.m}; "
+                    "the theorem pin is recorded as external metadata"
+                ),
+            ))
             continue
         witnessed_weight, names = witness
+        sorted_names = sorted(names)
         if pin.K > witnessed_weight:
             raise ValueError(
                 f"theorem pin {pin.theorem_id} claims K({pin.d},{pin.m})={pin.K}, "
-                f"but zoo witness(es) {sorted(names)} have kernel weight {witnessed_weight}"
+                f"but zoo witness(es) {sorted_names} have kernel weight {witnessed_weight}"
             )
+        if pin.K == witnessed_weight:
+            status = "matches_registered_witness"
+            detail = (
+                f"theorem K matches registered witness kernel weight {witnessed_weight}: "
+                f"{', '.join(sorted_names)}"
+            )
+        else:
+            status = "stronger_than_registered_witnesses"
+            detail = (
+                f"external theorem claims K={pin.K}, below the registered witnessed "
+                f"minimum {witnessed_weight}; qkernel has no registered witness at K={pin.K}"
+            )
+        audits.append(KernelTheoremPinAudit(
+            d=pin.d,
+            m=pin.m,
+            K=pin.K,
+            theorem_id=pin.theorem_id,
+            status=status,
+            witnessed_min_kernel_weight=witnessed_weight,
+            witness_names=sorted_names,
+            detail=detail,
+        ))
+    return audits
 
 
 def run_kernel_census(
@@ -213,13 +264,14 @@ def run_kernel_census(
     if not include_noncontextual:
         entries = [entry for entry in entries if entry.contextual]
     pins = list(theorem_pins or [])
-    _validate_theorem_pins_against_entries(pins, entries)
+    theorem_pin_audits = _audit_theorem_pins_against_entries(pins, entries)
 
     return KernelCensusReport(
         schema=SCHEMA_VERSION,
         entries=entries,
         summaries=_summaries(entries, pins),
         theorem_pins=pins,
+        theorem_pin_audits=theorem_pin_audits,
         claim_scope=(
             "registered-instance census for qkernel's benchmark zoo; "
             "safe input to K(d,m) theorem/proof work, not a full-family classification"
@@ -269,6 +321,7 @@ def kernel_census_markdown(report: KernelCensusReport | dict) -> str:
     entries = data.get("entries", [])
     summaries = data.get("summaries", [])
     theorem_pins = data.get("theorem_pins", [])
+    theorem_pin_audits = data.get("theorem_pin_audits", [])
 
     entry_rows = [
         [
@@ -332,6 +385,24 @@ def kernel_census_markdown(report: KernelCensusReport | dict) -> str:
                 for pin in theorem_pins
             ],
         ) or "No global K(d,m) theorem pins supplied.",
+        "",
+        "## Theorem Pin Audit",
+        "",
+        _table(
+            ["d,m", "K", "theorem", "status", "witnessed K", "witnesses", "detail"],
+            [
+                [
+                    f"({audit.get('d')},{audit.get('m')})",
+                    audit.get("K"),
+                    audit.get("theorem_id"),
+                    audit.get("status"),
+                    audit.get("witnessed_min_kernel_weight"),
+                    ", ".join(audit.get("witness_names", []) or []),
+                    audit.get("detail"),
+                ]
+                for audit in theorem_pin_audits
+            ],
+        ) or "No theorem pins to audit.",
         "",
         "## Instances",
         "",

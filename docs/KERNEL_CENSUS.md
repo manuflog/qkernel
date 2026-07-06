@@ -83,6 +83,21 @@ Pins are also checked against registered zoo witnesses. A pin claiming
 `K(d,m)` larger than an already witnessed contextual kernel weight is rejected
 as inconsistent with current qkernel evidence.
 
+Every accepted pin also receives a `theorem_pin_audits` record:
+
+```text
+matches_registered_witness
+stronger_than_registered_witnesses
+no_registered_witness
+```
+
+`matches_registered_witness` means the theorem's `K` equals the best registered
+zoo witness for that `(d,m)`. `stronger_than_registered_witnesses` means the
+external theorem claims a smaller global `K` than qkernel currently witnesses;
+the pin is kept, but the audit makes the gap explicit. `no_registered_witness`
+means qkernel has no contextual zoo instance for that `(d,m)` and is only
+recording external theorem metadata.
+
 ## Non-Claims
 
 The census does not claim:

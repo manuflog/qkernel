@@ -61,6 +61,8 @@ def test_kernel_census_accepts_external_theorem_pins():
     summary = {(s["d"], s["m"]): s for s in data["summaries"]}[(4, 2)]
 
     assert data["theorem_pins"][0]["theorem_id"] == "K42_MINIMAL_CERTIFICATE"
+    assert data["theorem_pin_audits"][0]["status"] == "matches_registered_witness"
+    assert "cert4_d4" in data["theorem_pin_audits"][0]["witness_names"]
     assert summary["global_K_proven"] is True
     assert summary["global_K_value"] == 6
     assert summary["proof_obligations"] == []
@@ -85,6 +87,52 @@ def test_kernel_census_rejects_pin_contradicting_zoo_witness():
         raise AssertionError("contradictory theorem pin must be rejected")
 
 
+def test_kernel_census_audits_pin_without_registered_witness():
+    pin = KernelTheoremPin(
+        d=8,
+        m=2,
+        K=6,
+        theorem_id="K82_EXTERNAL",
+        source="test",
+        proof_method="external proof",
+    )
+    data = kernel_census_report_dict(theorem_pins=[pin])
+
+    assert data["theorem_pin_audits"] == [{
+        "d": 8,
+        "m": 2,
+        "K": 6,
+        "theorem_id": "K82_EXTERNAL",
+        "status": "no_registered_witness",
+        "witnessed_min_kernel_weight": None,
+        "witness_names": [],
+        "detail": (
+            "no contextual zoo witness is registered for d=8, m=2; "
+            "the theorem pin is recorded as external metadata"
+        ),
+    }]
+
+
+def test_kernel_census_audits_pin_stronger_than_registered_witnesses():
+    pin = KernelTheoremPin(
+        d=4,
+        m=2,
+        K=5,
+        theorem_id="K42_STRONGER_EXTERNAL",
+        source="test",
+        proof_method="external proof",
+    )
+    data = kernel_census_report_dict(theorem_pins=[pin])
+    summary = {(s["d"], s["m"]): s for s in data["summaries"]}[(4, 2)]
+    audit = data["theorem_pin_audits"][0]
+
+    assert summary["global_K_proven"] is True
+    assert summary["global_K_value"] == 5
+    assert audit["status"] == "stronger_than_registered_witnesses"
+    assert audit["witnessed_min_kernel_weight"] == 6
+    assert "cert4_d4" in audit["witness_names"]
+
+
 def test_kernel_census_markdown_contains_scope_and_tables():
     pins = load_kernel_theorem_pins(ROOT / "examples/kernel_theorem_pins.json")
     md = kernel_census_markdown(kernel_census_report_dict(theorem_pins=pins))
@@ -93,6 +141,8 @@ def test_kernel_census_markdown_contains_scope_and_tables():
     assert "## By `(d,m)`" in md
     assert "## Proof Obligations" in md
     assert "## Theorem Pins" in md
+    assert "## Theorem Pin Audit" in md
+    assert "matches_registered_witness" in md
     assert "K42_MINIMAL_CERTIFICATE" in md
     assert "peres_mermin" in md
     assert "does not prove global K(d,m) lower bounds" in md
