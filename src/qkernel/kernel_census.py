@@ -35,6 +35,9 @@ class CensusSummary:
     noncontextual_instances: int
     witnessed_min_kernel_weight: int | None
     witness_names: list[str]
+    global_K_proven: bool
+    global_K_value: int | None
+    proof_obligations: list[str]
     claim_scope: str
 
 
@@ -89,6 +92,14 @@ def _summaries(entries: list[CensusEntry]) -> list[CensusSummary]:
             noncontextual_instances=len(noncontextual),
             witnessed_min_kernel_weight=min_weight,
             witness_names=witnesses,
+            global_K_proven=False,
+            global_K_value=None,
+            proof_obligations=[
+                "exhaust all relevant Weyl/context-family shapes or cite a checked classification",
+                "prove no contextual family exists below the witnessed kernel weight",
+                "attach machine-checkable MILP/CP-SAT certificates or a mathematical lower-bound proof",
+                "pin the theorem source before reporting a global K(d,m) value",
+            ],
             claim_scope=(
                 "witnessed minimum among registered zoo instances only; "
                 "not a proof of global K(d,m) unless supplied by an external theorem"
@@ -172,6 +183,7 @@ def kernel_census_markdown(report: KernelCensusReport | dict) -> str:
             s.get("contextual_instances"),
             s.get("noncontextual_instances"),
             s.get("witnessed_min_kernel_weight"),
+            s.get("global_K_proven"),
             ", ".join(s.get("witness_names", []) or []),
         ]
         for s in summaries
@@ -187,9 +199,16 @@ def kernel_census_markdown(report: KernelCensusReport | dict) -> str:
         "## By `(d,m)`",
         "",
         _table(
-            ["d,m", "contextual", "non-contextual", "witnessed min K", "witnesses"],
+            ["d,m", "contextual", "non-contextual", "witnessed min K", "global K proven", "witnesses"],
             summary_rows,
         ),
+        "",
+        "## Proof Obligations",
+        "",
+        "\n".join(
+            f"- ({s.get('d')},{s.get('m')}): " + "; ".join(s.get("proof_obligations", []) or [])
+            for s in summaries
+        ) or "-",
         "",
         "## Instances",
         "",

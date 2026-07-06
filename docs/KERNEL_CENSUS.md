@@ -40,7 +40,17 @@ claim scope
 ```
 
 The summary groups entries by `(d,m)` and reports the witnessed minimum among
-registered zoo instances.
+registered zoo instances. Every summary also carries:
+
+```text
+global_K_proven
+global_K_value
+proof_obligations
+```
+
+These fields are deliberately unset until a theorem source, exhaustive
+classification, or machine-checkable certificate proves a full-family K(d,m)
+claim.
 
 ## Non-Claims
 

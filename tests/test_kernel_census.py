@@ -29,6 +29,9 @@ def test_kernel_census_summaries_are_witness_scoped():
 
     assert summaries[(2, 2)]["witnessed_min_kernel_weight"] == 6
     assert "peres_mermin" in summaries[(2, 2)]["witness_names"]
+    assert summaries[(2, 2)]["global_K_proven"] is False
+    assert summaries[(2, 2)]["global_K_value"] is None
+    assert any("lower-bound proof" in item for item in summaries[(2, 2)]["proof_obligations"])
     assert summaries[(4, 2)]["witnessed_min_kernel_weight"] == 6
     assert "not a proof of global K(d,m)" in summaries[(4, 2)]["claim_scope"]
 
@@ -52,6 +55,7 @@ def test_kernel_census_markdown_contains_scope_and_tables():
 
     assert "# Kernel Census" in md
     assert "## By `(d,m)`" in md
+    assert "## Proof Obligations" in md
     assert "peres_mermin" in md
     assert "does not prove global K(d,m) lower bounds" in md
 
