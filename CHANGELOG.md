@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.43.0 — Paper-ready software artifact release
+
+- `CITATION.cff` (CFF 1.2.0; Apache-2.0, matching the repository license).
+- README: "Theory-to-hardware artifact pipeline" section documenting the
+  v0.39-v0.43 bridge — decide & certify (criterion ledger), design (cost- and
+  backend-aware), pin (benchmark zoo), run (sequential protocol), record
+  (hardware result registry).
+- Tagged release v0.43.0.
+
 ## v0.42.0 — Hardware Result Registry
 
 - New `qkernel.hardware_registry`: dependency-free, schema-validated JSON-lines
