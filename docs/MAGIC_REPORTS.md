@@ -20,7 +20,8 @@ It does not upgrade MagicScout diagnostics into factory claims.
 
 ```bash
 qkernel magic-report examples/magic_protocol_pm_probe.json --out magic_report.md
-qkernel magic-search-report examples/magic_search_twoqubit.json --out magic_search_report.md
+qkernel magic-search XI IX XX IY YI YY XY YX ZZ --top 5 > magic_search.json
+qkernel magic-search-report magic_search.json --out magic_search_report.md
 ```
 
 ## Python API

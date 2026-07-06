@@ -70,6 +70,10 @@ qkernel magic-portfolio examples/magic_portfolio.json
 qkernel magic-zoo
 qkernel magic-zoo --include-noncontextual
 qkernel magic-generate XI IX XX IY YI YY XY YX ZZ
+qkernel magic-search XI IX XX IY YI YY XY YX ZZ --top 5
+qkernel magic-templates
+qkernel magic-template-assess examples/magic_protocol_pm_probe.json --template contextuality_witness
+qkernel magic-report examples/magic_protocol_pm_probe.json --out magic_report.md
 qkernel magic-audit
 ```
 

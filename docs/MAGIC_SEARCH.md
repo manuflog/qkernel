@@ -23,6 +23,13 @@ report = search_magic_candidates_from_paulis(
 print(magic_search_report_dict(report))
 ```
 
+## CLI
+
+```bash
+qkernel magic-search XI IX XX IY YI YY XY YX ZZ --target T --top 5
+qkernel magic-search XI IX XX IY YI YY XY YX ZZ --required-template contextuality_witness
+```
+
 ## Standard demo
 
 ```python
