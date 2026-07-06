@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.42.0 — Hardware Result Registry
+
+- New `qkernel.hardware_registry`: dependency-free, schema-validated JSON-lines
+  records (`qkernel.hardware_result.v1`) closing the loop
+  theory -> certificate -> protocol -> **measured result**. Each record links
+  the measured contexts + constraint signs, the pre-run v0.40 backend-model
+  prediction (or an explicit None), per-context +/-1 product-statistic counts,
+  and a computed verdict: measured S, standard error, significance z above the
+  noncontextual bound n-2, certified at k sigma.
+- `compute_verdict` (counts -> S, sigma_S, z, certified), `new_record`,
+  `append_record`/`load_registry` (JSONL, validated on both write and read),
+  `prediction_gap` (measured minus predicted S).
+- Discipline: no bare "certified" flag without the numbers that produced it,
+  and every record carries a criterion ledger scoping the claim to a measured
+  odd-Q parity violation on the recorded device.
+
 ## v0.41.0 — Contextuality Benchmark Zoo
 
 - New `qkernel.zoo`: a curated registry of small contextuality instances with
