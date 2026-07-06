@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.40.0 — Backend-Aware Experiment Design
+
+- New `qkernel.backend_design`: rank contextuality tests by **expected
+  experimental significance** under a device readout-noise model
+  (`BackendModel`: per-qubit assignment errors; independent-reads or
+  joint-basis readout). `estimate_significance` returns expected S, the
+  noncontextual bound `n-2`, the margin, and the closed-form total shots to
+  certify at `k` sigma; `backend_aware_tests` re-ranks the minimal tests by
+  shots-to-certify (cost-minimal and significance-optimal tests need not
+  coincide once qubit errors are uneven).
+- Physics note encoded in the model: context operators are scalars, so
+  state-preparation noise does not degrade the signal — readout visibility is
+  the binding resource; certification threshold is mean visibility > (n-2)/n.
+- Estimates carry a criterion ledger with claim scope "planning estimate",
+  inheriting `stronger_verifier_passed` from the underlying verified test.
+- `docs/BACKEND_DESIGN.md`; tests incl. closed-form cross-check and
+  threshold/monotonicity behavior.
+
 ## v0.39.0 — Criterion Ledger / Semantic Firewall
 
 - **Criterion ledger.** New `metadata.CRITERIA` registry (`odd_Q_even_d_v1`,
