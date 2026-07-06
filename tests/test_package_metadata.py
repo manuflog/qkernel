@@ -1,5 +1,10 @@
 from pathlib import Path
 
+try:
+    import tomllib
+except ModuleNotFoundError:  # pragma: no cover - Python <3.11 local tooling
+    import tomli as tomllib
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -21,6 +26,14 @@ def test_pyproject_has_license_and_sat_extra():
     assert "Apache-2.0" in text
     assert "python-sat" in text
     assert "qkernel = [\"py.typed\"]" in text
+
+
+def test_dev_extra_covers_workflow_test_dependencies():
+    data = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    dev = data["project"]["optional-dependencies"]["dev"]
+
+    assert any(dep.startswith("pytest") for dep in dev)
+    assert any(dep.startswith("numpy") for dep in dev)
 
 
 def test_compiler_optimizer_path_doc_exists():
