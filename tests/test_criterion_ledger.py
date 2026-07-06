@@ -29,7 +29,12 @@ def test_registry_and_helper():
 
 
 def test_version_consistency():
-    import tomllib, pathlib
+    import pathlib
+    try:
+        import tomllib
+    except ModuleNotFoundError:
+        import tomli as tomllib
+
     py = tomllib.loads(pathlib.Path(__file__).resolve().parents[1].joinpath("pyproject.toml").read_text())
     assert py["project"]["version"] == QKERNEL_VERSION
 

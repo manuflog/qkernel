@@ -14,6 +14,10 @@
   the census with source, proof method, verifier, and notes preserved.
 - Theorem pins are rejected if they claim a K(d,m) value larger than an already
   witnessed zoo kernel for the same `(d,m)`.
+- Theorem pins now receive explicit audit records, and `kernel-census --target-dm
+  D,M` tracks open or pinned K(d,m) research targets such as `(8,2)` and `(16,2)`.
+- The development extra includes `numpy>=1.26`, matching test paths that import
+  the Qiskit protocol exporter.
 - Added `docs/KERNEL_CENSUS.md` and `tests/test_kernel_census.py`.
 
 ## v0.52.0 — MagicScout research report generator

@@ -22,6 +22,8 @@ def test_pyproject_has_license_and_sat_extra():
     text = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
     assert "Apache-2.0" in text
+    assert "numpy>=1.26" in text
+    assert "tomli>=2" in text
     assert "python-sat" in text
     assert "qkernel = [\"py.typed\"]" in text
 

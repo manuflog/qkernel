@@ -23,7 +23,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8"]
+dev = ["pytest>=8", "numpy>=1.26", "tomli>=2; python_version < '3.11'"]
 sat = ["python-sat[pblib,aiger]>=1.8.dev0"]
 cpsat = ["ortools>=9.0"]
 stim = ["stim>=1.14"]

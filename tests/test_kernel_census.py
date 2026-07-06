@@ -25,6 +25,7 @@ def test_kernel_census_pins_known_zoo_weights():
     assert by_name["cert4_d4"]["kernel_weight"] == 6
     assert by_name["single_context"]["contextual"] is False
     assert "does not prove global K(d,m) lower bounds" in data["non_claims"]
+    assert data["research_targets"] == []
     json.dumps(data)
 
 
@@ -133,16 +134,45 @@ def test_kernel_census_audits_pin_stronger_than_registered_witnesses():
     assert "cert4_d4" in audit["witness_names"]
 
 
+def test_kernel_census_tracks_open_research_targets():
+    data = kernel_census_report_dict(research_targets=[(8, 2), (16, 2), (8, 2)])
+    targets = {(t["d"], t["m"]): t for t in data["research_targets"]}
+
+    assert sorted(targets) == [(8, 2), (16, 2)]
+    assert targets[(8, 2)]["status"] == "open_no_registered_witness"
+    assert targets[(8, 2)]["witnessed_min_kernel_weight"] is None
+    assert targets[(8, 2)]["global_K_proven"] is False
+    assert any("construct or import" in item for item in targets[(8, 2)]["next_actions"])
+
+
+def test_kernel_census_tracks_witnessed_and_pinned_targets():
+    pins = load_kernel_theorem_pins(ROOT / "examples/kernel_theorem_pins.json")
+    data = kernel_census_report_dict(
+        theorem_pins=pins,
+        research_targets=[(4, 2), (2, 2)],
+    )
+    targets = {(t["d"], t["m"]): t for t in data["research_targets"]}
+
+    assert targets[(4, 2)]["status"] == "pinned_with_registered_witness"
+    assert targets[(4, 2)]["global_K_value"] == 6
+    assert targets[(4, 2)]["theorem_id"] == "K42_MINIMAL_CERTIFICATE"
+    assert "cert4_d4" in targets[(4, 2)]["witness_names"]
+    assert targets[(2, 2)]["status"] == "witnessed_unpinned"
+    assert targets[(2, 2)]["witnessed_min_kernel_weight"] == 6
+
+
 def test_kernel_census_markdown_contains_scope_and_tables():
     pins = load_kernel_theorem_pins(ROOT / "examples/kernel_theorem_pins.json")
-    md = kernel_census_markdown(kernel_census_report_dict(theorem_pins=pins))
+    md = kernel_census_markdown(kernel_census_report_dict(theorem_pins=pins, research_targets=[(8, 2)]))
 
     assert "# Kernel Census" in md
     assert "## By `(d,m)`" in md
     assert "## Proof Obligations" in md
     assert "## Theorem Pins" in md
     assert "## Theorem Pin Audit" in md
+    assert "## Research Targets" in md
     assert "matches_registered_witness" in md
+    assert "open_no_registered_witness" in md
     assert "K42_MINIMAL_CERTIFICATE" in md
     assert "peres_mermin" in md
     assert "does not prove global K(d,m) lower bounds" in md
@@ -174,6 +204,8 @@ def test_cli_kernel_census_with_theorem_pins():
             "kernel-census",
             "--theorem-pins",
             str(ROOT / "examples/kernel_theorem_pins.json"),
+            "--target-dm",
+            "8,2",
         ],
         cwd=ROOT,
         capture_output=True,
@@ -185,3 +217,4 @@ def test_cli_kernel_census_with_theorem_pins():
     summary = {(s["d"], s["m"]): s for s in data["summaries"]}[(4, 2)]
     assert summary["global_K_proven"] is True
     assert data["theorem_pins"][0]["K"] == 6
+    assert data["research_targets"][0]["status"] == "open_no_registered_witness"

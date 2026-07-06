@@ -13,6 +13,7 @@ not prove a global K(d,m) lower bound.
 qkernel kernel-census
 qkernel kernel-census --contextual-only
 qkernel kernel-census --theorem-pins examples/kernel_theorem_pins.json
+qkernel kernel-census --target-dm 8,2 --target-dm 16,2
 qkernel kernel-census --out-md kernel_census.md
 ```
 
@@ -52,6 +53,22 @@ proof_obligations
 These fields are deliberately unset until a theorem source, exhaustive
 classification, or machine-checkable certificate proves a full-family K(d,m)
 claim.
+
+Explicit research targets can also be tracked with `--target-dm D,M`. Targets
+are useful for atlas work such as `K(8,2)` and `K(16,2)`, where qkernel should
+preserve a visible TODO even before a contextual zoo witness exists. Target
+records are emitted under `research_targets` and classify each target as:
+
+```text
+pinned_with_registered_witness
+pinned_without_registered_witness
+witnessed_unpinned
+open_no_registered_witness
+```
+
+Targets do not create evidence. They only connect current qkernel witnesses,
+optional theorem pins, proof obligations, and next actions in one auditable
+record.
 
 ## Theorem Pins
 

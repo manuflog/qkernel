@@ -68,12 +68,28 @@ class KernelTheoremPinAudit:
 
 
 @dataclass(frozen=True)
+class KernelCensusTarget:
+    d: int
+    m: int
+    status: str
+    witnessed_min_kernel_weight: int | None
+    witness_names: list[str]
+    global_K_proven: bool
+    global_K_value: int | None
+    theorem_id: str | None
+    proof_obligations: list[str]
+    next_actions: list[str]
+    claim_scope: str
+
+
+@dataclass(frozen=True)
 class KernelCensusReport:
     schema: str
     entries: list[CensusEntry]
     summaries: list[CensusSummary]
     theorem_pins: list[KernelTheoremPin]
     theorem_pin_audits: list[KernelTheoremPinAudit]
+    research_targets: list[KernelCensusTarget]
     claim_scope: str
     non_claims: list[str]
 
@@ -101,6 +117,28 @@ def _entry(inst: ZooInstance) -> CensusEntry:
     )
 
 
+def _global_proof_obligations() -> list[str]:
+    return [
+        "exhaust all relevant Weyl/context-family shapes or cite a checked classification",
+        "prove no contextual family exists below the witnessed kernel weight",
+        "attach machine-checkable MILP/CP-SAT certificates or a mathematical lower-bound proof",
+        "pin the theorem source before reporting a global K(d,m) value",
+    ]
+
+
+def _witnessed_minima(entries: list[CensusEntry]) -> dict[tuple[int, int], tuple[int, list[str]]]:
+    witnessed: dict[tuple[int, int], tuple[int, list[str]]] = {}
+    for entry in entries:
+        if not entry.contextual or entry.kernel_weight is None:
+            continue
+        key = (entry.d, entry.m)
+        if key not in witnessed or entry.kernel_weight < witnessed[key][0]:
+            witnessed[key] = (entry.kernel_weight, [entry.name])
+        elif entry.kernel_weight == witnessed[key][0]:
+            witnessed[key][1].append(entry.name)
+    return {key: (weight, sorted(names)) for key, (weight, names) in witnessed.items()}
+
+
 def _summaries(entries: list[CensusEntry], theorem_pins: list[KernelTheoremPin]) -> list[CensusSummary]:
     grouped: dict[tuple[int, int], list[CensusEntry]] = {}
     for entry in entries:
@@ -118,12 +156,7 @@ def _summaries(entries: list[CensusEntry], theorem_pins: list[KernelTheoremPin])
         if pin is None:
             global_K_proven = False
             global_K_value = None
-            proof_obligations = [
-                "exhaust all relevant Weyl/context-family shapes or cite a checked classification",
-                "prove no contextual family exists below the witnessed kernel weight",
-                "attach machine-checkable MILP/CP-SAT certificates or a mathematical lower-bound proof",
-                "pin the theorem source before reporting a global K(d,m) value",
-            ]
+            proof_obligations = _global_proof_obligations()
             claim_scope = (
                 "witnessed minimum among registered zoo instances only; "
                 "not a proof of global K(d,m) unless supplied by an external theorem"
@@ -190,16 +223,7 @@ def _audit_theorem_pins_against_entries(
     pins: list[KernelTheoremPin],
     entries: list[CensusEntry],
 ) -> list[KernelTheoremPinAudit]:
-    witnessed: dict[tuple[int, int], tuple[int, list[str]]] = {}
-    for entry in entries:
-        if not entry.contextual or entry.kernel_weight is None:
-            continue
-        key = (entry.d, entry.m)
-        if key not in witnessed or entry.kernel_weight < witnessed[key][0]:
-            witnessed[key] = (entry.kernel_weight, [entry.name])
-        elif entry.kernel_weight == witnessed[key][0]:
-            witnessed[key][1].append(entry.name)
-
+    witnessed = _witnessed_minima(entries)
     audits: list[KernelTheoremPinAudit] = []
     for pin in pins:
         witness = witnessed.get((pin.d, pin.m))
@@ -219,17 +243,16 @@ def _audit_theorem_pins_against_entries(
             ))
             continue
         witnessed_weight, names = witness
-        sorted_names = sorted(names)
         if pin.K > witnessed_weight:
             raise ValueError(
                 f"theorem pin {pin.theorem_id} claims K({pin.d},{pin.m})={pin.K}, "
-                f"but zoo witness(es) {sorted_names} have kernel weight {witnessed_weight}"
+                f"but zoo witness(es) {names} have kernel weight {witnessed_weight}"
             )
         if pin.K == witnessed_weight:
             status = "matches_registered_witness"
             detail = (
                 f"theorem K matches registered witness kernel weight {witnessed_weight}: "
-                f"{', '.join(sorted_names)}"
+                f"{', '.join(names)}"
             )
         else:
             status = "stronger_than_registered_witnesses"
@@ -244,16 +267,89 @@ def _audit_theorem_pins_against_entries(
             theorem_id=pin.theorem_id,
             status=status,
             witnessed_min_kernel_weight=witnessed_weight,
-            witness_names=sorted_names,
+            witness_names=names,
             detail=detail,
         ))
     return audits
+
+
+def _research_target_records(
+    entries: list[CensusEntry],
+    theorem_pins: list[KernelTheoremPin],
+    targets: list[tuple[int, int]],
+) -> list[KernelCensusTarget]:
+    witnessed = _witnessed_minima(entries)
+    pins_by_dm = {(pin.d, pin.m): pin for pin in theorem_pins}
+    out: list[KernelCensusTarget] = []
+    for d, m in sorted(set(targets)):
+        witness = witnessed.get((d, m))
+        pin = pins_by_dm.get((d, m))
+        witnessed_weight = witness[0] if witness else None
+        witness_names = witness[1] if witness else []
+        global_K_proven = pin is not None
+        global_K_value = pin.K if pin is not None else None
+        theorem_id = pin.theorem_id if pin is not None else None
+        proof_obligations = [] if pin is not None else _global_proof_obligations()
+
+        if pin is not None and witness is not None:
+            status = "pinned_with_registered_witness"
+            next_actions = [
+                "keep theorem source and verifier metadata current",
+                "add independent verifier artifacts when available",
+            ]
+            claim_scope = (
+                f"global K({d},{m})={pin.K} is externally pinned; "
+                "qkernel also has registered zoo witness evidence"
+            )
+        elif pin is not None:
+            status = "pinned_without_registered_witness"
+            next_actions = [
+                "register a contextual zoo witness or certificate for this target",
+                "add independent verifier artifacts when available",
+            ]
+            claim_scope = (
+                f"global K({d},{m})={pin.K} is externally pinned; "
+                "qkernel has no registered zoo witness for this target"
+            )
+        elif witness is not None:
+            status = "witnessed_unpinned"
+            next_actions = [
+                "prove no contextual family exists below the witnessed kernel weight",
+                "attach an external theorem pin once the global proof is checked",
+            ]
+            claim_scope = "registered zoo witness only; not a global K(d,m) theorem"
+        else:
+            status = "open_no_registered_witness"
+            next_actions = [
+                "construct or import a contextual witness for this target",
+                "run kernel extraction and Z_d valuation verification on the witness",
+                "attach classification or solver certificates before pinning global K(d,m)",
+            ]
+            claim_scope = (
+                "open research target; no qkernel witness and no external theorem pin supplied"
+            )
+
+        out.append(KernelCensusTarget(
+            d=d,
+            m=m,
+            status=status,
+            witnessed_min_kernel_weight=witnessed_weight,
+            witness_names=witness_names,
+            global_K_proven=global_K_proven,
+            global_K_value=global_K_value,
+            theorem_id=theorem_id,
+            proof_obligations=proof_obligations,
+            next_actions=next_actions,
+            claim_scope=claim_scope,
+        ))
+    return out
 
 
 def run_kernel_census(
     *,
     include_noncontextual: bool = True,
     theorem_pins: list[KernelTheoremPin] | None = None,
+    research_targets: list[tuple[int, int]] | None = None,
 ) -> KernelCensusReport:
     """Run a conservative minimal-kernel census over the benchmark zoo.
 
@@ -265,6 +361,7 @@ def run_kernel_census(
         entries = [entry for entry in entries if entry.contextual]
     pins = list(theorem_pins or [])
     theorem_pin_audits = _audit_theorem_pins_against_entries(pins, entries)
+    targets = list(research_targets or [])
 
     return KernelCensusReport(
         schema=SCHEMA_VERSION,
@@ -272,6 +369,7 @@ def run_kernel_census(
         summaries=_summaries(entries, pins),
         theorem_pins=pins,
         theorem_pin_audits=theorem_pin_audits,
+        research_targets=_research_target_records(entries, pins, targets),
         claim_scope=(
             "registered-instance census for qkernel's benchmark zoo; "
             "safe input to K(d,m) theorem/proof work, not a full-family classification"
@@ -289,10 +387,12 @@ def kernel_census_report_dict(
     *,
     include_noncontextual: bool = True,
     theorem_pins: list[KernelTheoremPin] | None = None,
+    research_targets: list[tuple[int, int]] | None = None,
 ) -> dict:
     return asdict(run_kernel_census(
         include_noncontextual=include_noncontextual,
         theorem_pins=theorem_pins,
+        research_targets=research_targets,
     ))
 
 
@@ -322,6 +422,7 @@ def kernel_census_markdown(report: KernelCensusReport | dict) -> str:
     summaries = data.get("summaries", [])
     theorem_pins = data.get("theorem_pins", [])
     theorem_pin_audits = data.get("theorem_pin_audits", [])
+    research_targets = data.get("research_targets", [])
 
     entry_rows = [
         [
@@ -403,6 +504,23 @@ def kernel_census_markdown(report: KernelCensusReport | dict) -> str:
                 for audit in theorem_pin_audits
             ],
         ) or "No theorem pins to audit.",
+        "",
+        "## Research Targets",
+        "",
+        _table(
+            ["d,m", "status", "witnessed K", "global K", "theorem", "next actions"],
+            [
+                [
+                    f"({target.get('d')},{target.get('m')})",
+                    target.get("status"),
+                    target.get("witnessed_min_kernel_weight"),
+                    target.get("global_K_value"),
+                    target.get("theorem_id"),
+                    "; ".join(target.get("next_actions", []) or []),
+                ]
+                for target in research_targets
+            ],
+        ) or "No explicit research targets supplied.",
         "",
         "## Instances",
         "",

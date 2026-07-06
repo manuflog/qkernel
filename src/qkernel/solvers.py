@@ -16,6 +16,10 @@ def hamming_weight(vec: list[int]) -> int:
     return sum(1 for x in vec if x)
 
 
+def _bit_count(x: int) -> int:
+    return bin(x).count("1")
+
+
 def _row_bitsets(program: WeylProgram) -> tuple[list[int], list[int], int]:
     """Return incidence rows as integer bitsets, carry vector, and column count."""
     A, _ = build_incidence(program)
@@ -165,7 +169,7 @@ def find_min_odd_cycle_branch_bound(
     if _basis_reduce(suffix_bases[0], target) != 0:
         return None
 
-    order = sorted(range(n), key=lambda i: (b[i], row_bits[i].bit_count()), reverse=True)
+    order = sorted(range(n), key=lambda i: (b[i], _bit_count(row_bits[i])), reverse=True)
     ordered_states = [states[i] for i in order]
 
     suffix_bases = _suffix_span_bases(ordered_states)

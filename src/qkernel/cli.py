@@ -109,6 +109,18 @@ def _compress(program, args) -> None:
     print(kernel_to_json(effective_program, kernel) if args.json else kernel_to_markdown(effective_program, kernel))
 
 
+def _parse_dm_target(text: str) -> tuple[int, int]:
+    try:
+        d_text, m_text = text.split(",", 1)
+        d = int(d_text)
+        m = int(m_text)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("target must be formatted as D,M, for example 8,2") from exc
+    if d <= 0 or m <= 0:
+        raise argparse.ArgumentTypeError("target dimensions require positive D and M")
+    return d, m
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="qkernel")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -134,6 +146,14 @@ def main() -> None:
     census_cmd = sub.add_parser("kernel-census", help="run conservative minimal-kernel census over benchmark zoo")
     census_cmd.add_argument("--contextual-only", action="store_true", help="omit non-contextual control instances")
     census_cmd.add_argument("--theorem-pins", help="optional JSON file of externally proven K(d,m) theorem pins")
+    census_cmd.add_argument(
+        "--target-dm",
+        action="append",
+        default=[],
+        type=_parse_dm_target,
+        metavar="D,M",
+        help="explicit K(d,m) research target to track; repeatable, e.g. --target-dm 8,2",
+    )
     census_cmd.add_argument("--out-md", help="optional Markdown report path")
 
     activation_cmd = sub.add_parser("activation", help="check contextuality activation by d->2d embedding of a Weyl base")
@@ -426,6 +446,7 @@ def main() -> None:
         report = kernel_census_report_dict(
             include_noncontextual=not args.contextual_only,
             theorem_pins=pins,
+            research_targets=args.target_dm,
         )
         if args.out_md:
             write_kernel_census_markdown(report, args.out_md)
