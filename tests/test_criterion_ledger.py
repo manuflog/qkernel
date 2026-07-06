@@ -1,4 +1,11 @@
 """v0.39 semantic firewall: every user-facing result carries a criterion ledger."""
+from pathlib import Path
+
+try:
+    import tomllib
+except ModuleNotFoundError:  # pragma: no cover - Python <3.11 local tooling
+    import tomli as tomllib
+
 from qkernel.metadata import CRITERIA, criterion_ledger, QKERNEL_VERSION
 from qkernel.examples import peres_mermin_program
 from qkernel.subroutine import analyze_contextuality
@@ -29,8 +36,8 @@ def test_registry_and_helper():
 
 
 def test_version_consistency():
-    import tomllib, pathlib
-    py = tomllib.loads(pathlib.Path(__file__).resolve().parents[1].joinpath("pyproject.toml").read_text())
+    pyproject = Path(__file__).resolve().parents[1] / "pyproject.toml"
+    py = tomllib.loads(pyproject.read_text(encoding="utf-8"))
     assert py["project"]["version"] == QKERNEL_VERSION
 
 
