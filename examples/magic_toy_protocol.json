@@ -1,0 +1,36 @@
+{
+  "type": "pauli_schedule",
+  "layers": [
+    [
+      "ZI",
+      "IZ",
+      "ZZ"
+    ],
+    [
+      "IX",
+      "XI",
+      "XX"
+    ],
+    [
+      "ZX",
+      "XZ",
+      "YY"
+    ],
+    [
+      "ZI",
+      "IX",
+      "ZX"
+    ],
+    [
+      "IZ",
+      "XI",
+      "XZ"
+    ],
+    [
+      "ZZ",
+      "XX",
+      "YY"
+    ]
+  ],
+  "notes": "Toy MagicScout candidate: Peres-Mermin contextuality core represented as a Pauli measurement schedule. Diagnostic example, not a distillation protocol."
+}

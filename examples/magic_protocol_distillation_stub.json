@@ -1,0 +1,26 @@
+{
+  "type": "qkernel.magic_protocol.v1",
+  "protocol_id": "distillation_stub_pm_probe",
+  "target": "T",
+  "role": "candidate_distillation_check_motif",
+  "input_kind": "schedule",
+  "claim_scope": "diagnostic_only",
+  "schedule": {
+    "layers": [
+      ["ZI", "IZ", "ZZ"],
+      ["IX", "XI", "XX"],
+      ["ZX", "XZ", "YY"],
+      ["ZI", "IX", "ZX"],
+      ["IZ", "XI", "XZ"],
+      ["ZZ", "XX", "YY"]
+    ]
+  },
+  "factory_metadata": {
+    "input_magic_states": 15,
+    "output_magic_states": 1,
+    "acceptance_probability": null,
+    "distance": null,
+    "decoder": null,
+    "notes": "Metadata stub for template checking only; not a 15-to-1 proof."
+  }
+}

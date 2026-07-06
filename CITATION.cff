@@ -6,7 +6,7 @@ authors:
   - family-names: "Flores Gordillo"
     given-names: "Manuel"
     orcid: "https://orcid.org/0009-0006-8246-0343"
-version: 0.43.0
+version: 0.52.0
 date-released: 2026-07-06
 repository-code: "https://github.com/manuflog/qkernel"
 license: Apache-2.0

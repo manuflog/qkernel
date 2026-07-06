@@ -1,0 +1,8 @@
+{
+  "default_readout_error": 0.02,
+  "readout_error": {
+    "0": 0.015,
+    "1": 0.025
+  },
+  "joint_basis": false
+}

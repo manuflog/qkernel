@@ -1,5 +1,53 @@
 # Changelog
 
+## v0.52.0 — MagicScout research report generator
+
+- New `qkernel.magic_report`: Markdown report generator for single MagicScout
+  reports, portfolios, and search results.
+- Reports preserve the semantic firewall: criterion ledger, backend-planning
+  estimates, template compatibility, missing evidence, safe language, forbidden
+  language, and next-experiment checklist.
+- Added `docs/MAGIC_REPORTS.md` and `tests/test_magic_report.py`.
+
+## v0.51.0 — MagicScout candidate-search engine
+
+- New `qkernel.magic_search`: candidate discovery over available Pauli measurements.
+  It uses the existing experiment-design layer to generate contextuality motifs,
+  runs each candidate through MagicScout, checks factory-template compatibility,
+  optionally incorporates backend estimates, and ranks candidates by a transparent
+  research-prioritization rule.
+- New standard two-qubit search helper over the doily / all 15 two-qubit Paulis.
+- New `docs/MAGIC_SEARCH.md` and tests for ranking, required-template filtering,
+  negative/non-claim guardrails, and JSON serializability.
+- Scope discipline: search outputs are research hypotheses, not generated physical
+  magic-state factories or overhead improvements.
+
+## v0.50.0 — MagicScout factory-template bridge
+
+- Added `qkernel.magic_templates`: conservative checklist templates for mapping
+  MagicScout reports to possible research roles: contextuality witness,
+  verification subroutine, hardware-ready probe, distillation-check motif, and
+  cultivation/activation motif.
+- MagicScout reports now carry template assessments as diagnostic metadata.
+- Added a distillation-stub example that deliberately remains blocked because
+  acceptance probability / real factory evidence is missing.
+- Added template tests to ensure the bridge never claims a valid factory,
+  threshold, fidelity, or overhead improvement.
+
+## v0.49.0 — MagicScout application workflow
+
+- MagicScout matured from a single diagnostic into an application workflow:
+  protocol schema, portfolio ranking, benchmark-zoo bridge, backend-aware
+  significance estimates, candidate generation from available Pauli sets, and
+  a dedicated MagicScout claim-scope audit.
+- New protocol type: `qkernel.magic_protocol.v1`.
+- New portfolio type: `qkernel.magic_portfolio.v1`.
+- New workflows: `magic-protocol`, `magic-portfolio`, `magic-zoo`,
+  `magic-generate`, and `magic-audit`.
+- Still no magic-factory overclaim: reports list missing factory evidence and
+  explicit non-claims for overhead, thresholds, fidelity, acceptance probability,
+  code distance, decoder behavior, and space-time volume.
+
 ## v0.43.0 — Paper-ready software artifact release
 
 - `CITATION.cff` (CFF 1.2.0; Apache-2.0, matching the repository license).

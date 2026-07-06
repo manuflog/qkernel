@@ -30,6 +30,27 @@ from .selftest import run_selftest_dict
 from .rewrite_policy import list_rewrite_policies_dict, assess_rewrite_candidate_dict
 from .valuation import check_zd_valuation, check_kernel_zd_valuation, two_primary_report, spectrum_summary
 from .export_circuit import export_qiskit_protocol
+from .magic import (
+    analyze_magic_portfolio_file,
+    analyze_magic_protocol,
+    analyze_magic_protocol_record,
+    generated_magic_report_dict,
+    generate_magic_candidates_from_paulis,
+    load_magic_protocol,
+    magic_audit_report_dict,
+    magic_portfolio_report_dict,
+    magic_report_dict,
+    magic_zoo_report_dict,
+    run_magic_audit,
+    run_magic_zoo,
+)
+from .magic_report import magic_report_markdown, magic_search_markdown, write_markdown_report
+from .magic_search import magic_search_report_dict, search_magic_candidates_from_paulis
+from .magic_templates import (
+    assess_magic_templates,
+    magic_template_assessments_dict,
+    magic_templates_catalog_dict,
+)
 
 
 def _add_solver_args(cmd) -> None:
@@ -318,6 +339,55 @@ def main() -> None:
     canon_cmd = sub.add_parser("canonicalize-report", help="report duplicate Weyl labels")
     canon_cmd.add_argument("path")
     canon_cmd.add_argument("--input", choices=["weyl", "pauli", "schedule", "table", "stim-lite", "qiskit-lite"], default="weyl")
+
+    magic_analyze_cmd = sub.add_parser("magic-analyze", help="MagicScout diagnostic for an input program")
+    magic_analyze_cmd.add_argument("path")
+    magic_analyze_cmd.add_argument("--input", choices=["weyl", "pauli", "schedule", "table", "stim-lite", "qiskit-lite"], default="weyl")
+    magic_analyze_cmd.add_argument("--target", default="generic_non_clifford")
+    magic_analyze_cmd.add_argument("--protocol-id", default="candidate_protocol")
+    magic_analyze_cmd.add_argument("--certify-minimal", action="store_true")
+    magic_analyze_cmd.add_argument("--no-enumerate", action="store_true")
+
+    magic_protocol_cmd = sub.add_parser("magic-protocol", help="MagicScout protocol-schema diagnostic")
+    magic_protocol_cmd.add_argument("path")
+    magic_protocol_cmd.add_argument("--certify-minimal", action="store_true")
+    magic_protocol_cmd.add_argument("--no-enumerate", action="store_true")
+
+    magic_portfolio_cmd = sub.add_parser("magic-portfolio", help="rank a portfolio of MagicScout protocol records")
+    magic_portfolio_cmd.add_argument("path")
+
+    magic_zoo_cmd = sub.add_parser("magic-zoo", help="rank Contextuality Benchmark Zoo instances with MagicScout")
+    magic_zoo_cmd.add_argument("--include-noncontextual", action="store_true")
+    magic_zoo_cmd.add_argument("--top", type=int, default=None)
+
+    magic_generate_cmd = sub.add_parser("magic-generate", help="generate MagicScout candidates from available Pauli operators")
+    magic_generate_cmd.add_argument("paulis", nargs="+")
+    magic_generate_cmd.add_argument("--target", default="generic_non_clifford")
+    magic_generate_cmd.add_argument("--top", type=int, default=10)
+
+    magic_audit_cmd = sub.add_parser("magic-audit", help="run MagicScout claim-scope/readiness audit")
+
+    magic_templates_cmd = sub.add_parser("magic-templates", help="list MagicScout factory-template checklists")
+
+    magic_template_assess_cmd = sub.add_parser("magic-template-assess", help="assess MagicScout template compatibility for a protocol")
+    magic_template_assess_cmd.add_argument("path")
+    magic_template_assess_cmd.add_argument("--template", action="append", dest="templates", help="template id to require; repeatable")
+
+    magic_search_cmd = sub.add_parser("magic-search", help="search available Pauli operators for MagicScout candidates")
+    magic_search_cmd.add_argument("paulis", nargs="+")
+    magic_search_cmd.add_argument("--target", default="generic_non_clifford")
+    magic_search_cmd.add_argument("--top", type=int, default=10)
+    magic_search_cmd.add_argument("--candidates", type=int, default=50)
+    magic_search_cmd.add_argument("--required-template", action="append", default=[])
+    magic_search_cmd.add_argument("--certify-minimal", action="store_true")
+
+    magic_report_cmd = sub.add_parser("magic-report", help="write a Markdown MagicScout protocol report")
+    magic_report_cmd.add_argument("path")
+    magic_report_cmd.add_argument("--out", required=True)
+
+    magic_search_report_cmd = sub.add_parser("magic-search-report", help="write a Markdown MagicScout search report from JSON")
+    magic_search_report_cmd.add_argument("path")
+    magic_search_report_cmd.add_argument("--out", required=True)
 
     args = parser.parse_args()
 
@@ -741,6 +811,74 @@ def main() -> None:
     elif args.command == "canonicalize-report":
         program = _load_by_kind(args.path, args.input)
         print(json.dumps(canonicalization_report(program), indent=2))
+
+    elif args.command == "magic-analyze":
+        program = _load_by_kind(args.path, args.input)
+        report = analyze_magic_protocol(
+            program,
+            protocol_id=args.protocol_id,
+            target=args.target,
+            enumerate_all_kernels=not args.no_enumerate,
+            certify_minimal=args.certify_minimal,
+        )
+        print(json.dumps(magic_report_dict(report), indent=2))
+
+    elif args.command == "magic-protocol":
+        proto = load_magic_protocol(args.path)
+        report = analyze_magic_protocol_record(
+            proto,
+            enumerate_all_kernels=not args.no_enumerate,
+            certify_minimal=args.certify_minimal,
+        )
+        print(json.dumps(magic_report_dict(report), indent=2))
+
+    elif args.command == "magic-portfolio":
+        report = analyze_magic_portfolio_file(args.path)
+        print(json.dumps(magic_portfolio_report_dict(report), indent=2))
+
+    elif args.command == "magic-zoo":
+        entries = run_magic_zoo(include_noncontextual=args.include_noncontextual, top=args.top)
+        print(json.dumps(magic_zoo_report_dict(entries), indent=2))
+
+    elif args.command == "magic-generate":
+        candidates = generate_magic_candidates_from_paulis(args.paulis, target=args.target, top=args.top)
+        print(json.dumps(generated_magic_report_dict(candidates), indent=2))
+
+    elif args.command == "magic-audit":
+        report = run_magic_audit()
+        print(json.dumps(magic_audit_report_dict(report), indent=2))
+
+    elif args.command == "magic-templates":
+        print(json.dumps(magic_templates_catalog_dict(), indent=2))
+
+    elif args.command == "magic-template-assess":
+        proto = load_magic_protocol(args.path)
+        report = analyze_magic_protocol_record(proto)
+        assessments = assess_magic_templates(report, template_ids=args.templates)
+        print(json.dumps(magic_template_assessments_dict(assessments), indent=2))
+
+    elif args.command == "magic-search":
+        report = search_magic_candidates_from_paulis(
+            args.paulis,
+            target=args.target,
+            top=args.top,
+            candidates=args.candidates,
+            required_templates=args.required_template,
+            certify_minimal=args.certify_minimal,
+        )
+        print(json.dumps(magic_search_report_dict(report), indent=2))
+
+    elif args.command == "magic-report":
+        proto = load_magic_protocol(args.path)
+        report = analyze_magic_protocol_record(proto)
+        write_markdown_report(magic_report_markdown(report), args.out)
+        print(f"wrote Markdown MagicScout report: {args.out}")
+
+    elif args.command == "magic-search-report":
+        with open(args.path) as fh:
+            data = json.load(fh)
+        write_markdown_report(magic_search_markdown(data), args.out)
+        print(f"wrote Markdown MagicScout search report: {args.out}")
 
 
 if __name__ == "__main__":

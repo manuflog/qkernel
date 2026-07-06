@@ -1,0 +1,57 @@
+{
+  "type": "qkernel.magic_protocol.v1",
+  "protocol_id": "pm_magic_probe",
+  "target": "T",
+  "role": "candidate_magic_verification_subroutine",
+  "input_kind": "schedule",
+  "claim_scope": "diagnostic_only",
+  "schedule": {
+    "layers": [
+      [
+        "ZI",
+        "IZ",
+        "ZZ"
+      ],
+      [
+        "IX",
+        "XI",
+        "XX"
+      ],
+      [
+        "ZX",
+        "XZ",
+        "YY"
+      ],
+      [
+        "ZI",
+        "IX",
+        "ZX"
+      ],
+      [
+        "IZ",
+        "XI",
+        "XZ"
+      ],
+      [
+        "ZZ",
+        "XX",
+        "YY"
+      ]
+    ]
+  },
+  "backend_model": {
+    "default_readout_error": 0.02,
+    "readout_error": {
+      "0": 0.015,
+      "1": 0.025
+    },
+    "joint_basis": false
+  },
+  "factory_metadata": {
+    "input_magic_states": null,
+    "output_magic_states": null,
+    "acceptance_probability": null,
+    "distance": null,
+    "decoder": null
+  }
+}

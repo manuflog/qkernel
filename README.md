@@ -138,6 +138,11 @@ Two applications are built on it:
   a non-contextual base can become contextual under passive `d -> 2d` embedding (the *fiber
   pool*); the yield reproduces the verified research curve and falls sharply with base dimension.
   See [`docs/ACTIVATION.md`](docs/ACTIVATION.md).
+- **MagicScout** (`qkernel.magic`, `magic-protocol` / `magic-search` / `magic-report` CLI):
+  a conservative magic-state-adjacent triage layer that ranks contextuality motifs, checks
+  factory-template compatibility, renders research reports, and explicitly preserves non-claims
+  around overhead, thresholds, fidelity, acceptance probability, code distance, decoder behavior,
+  and space-time volume. See [`docs/MAGICSCOUT.md`](docs/MAGICSCOUT.md).
 
 This is classical analysis (no quantum speedup is claimed); the design value is composability.
 
