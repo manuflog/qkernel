@@ -8,7 +8,10 @@
 > **Scope (read first).** Q-Kernel finds small, independently verifiable contextuality
 > kernels in Weyl/Pauli measurement programs. It is **not** a magic-state optimizer, a
 > T-count optimizer, a tower-compression optimizer, or a compiler semantic-equivalence
-> engine, and it does **not** claim passive dimension embedding is free. See
+> engine, and it does **not** claim passive dimension embedding is free. Every
+> user-facing result carries a machine-readable `criterion_ledger` declaring the
+> criterion it was verified under (`odd_Q_even_d_v1` vs `zd_avn_valuation_v1`),
+> the verifier used, the claim scope, and whether the stronger verifier passed. See
 > [`ALPHA_README.md`](ALPHA_README.md) for the full positioning.
 
 > **Part of a larger program.** Q-Kernel is the software component of a research program on

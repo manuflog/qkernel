@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.39.0 — Criterion Ledger / Semantic Firewall
+
+- **Criterion ledger.** New `metadata.CRITERIA` registry (`odd_Q_even_d_v1`,
+  `zd_avn_valuation_v1`) and `metadata.criterion_ledger(...)` helper. Every
+  user-facing result now carries a machine-readable `criterion_ledger` declaring
+  `criterion_id`, `verifier_used`, `claim_scope`, `stronger_verifier_available`,
+  and `stronger_verifier_passed`, so odd-Q parity verdicts can never silently be
+  read as Z_d/AvN valuation verdicts (or vice versa).
+- Ledger threaded through: `ActivationReport`, `ActivatedResource` (which now
+  additionally *runs* `check_kernel_zd_valuation` on the activated kernel and
+  records the outcome), `ContextualityTest` (experiment design; populated from
+  `verify_kernel`'s `zd_contextual`), and `ContextualitySubroutineResult`.
+- **Wording firewall.** `docs/ACTIVATION.md` and `embedding.py` no longer call
+  lifting a "free, passive operation"; the embedding is described as a
+  label-level passive embedding in the mathematical model, with an explicit
+  disclaimer that no physical/compiler resource-freeness is claimed (this
+  resolves the contradiction with the README scope box).
+- Fixed stale `metadata.QKERNEL_VERSION` (was 0.37.0).
+
 ## [0.38.0] - 2026-07-05
 ### Added
 - Activation as resource generation (`qkernel.embedding.activated_resource`, `activation-resource` CLI):
