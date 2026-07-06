@@ -3,7 +3,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from qkernel.kernel_census import kernel_census_report_dict
+from qkernel.kernel_census import kernel_census_markdown, kernel_census_report_dict
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -45,3 +45,29 @@ def test_cli_kernel_census_contextual_only():
     data = json.loads(proc.stdout)
     assert data["entries"]
     assert all(entry["contextual"] for entry in data["entries"])
+
+
+def test_kernel_census_markdown_contains_scope_and_tables():
+    md = kernel_census_markdown(kernel_census_report_dict())
+
+    assert "# Kernel Census" in md
+    assert "## By `(d,m)`" in md
+    assert "peres_mermin" in md
+    assert "does not prove global K(d,m) lower bounds" in md
+
+
+def test_cli_kernel_census_writes_markdown(tmp_path):
+    out = tmp_path / "kernel_census.md"
+    proc = subprocess.run(
+        [sys.executable, "-m", "qkernel.cli", "kernel-census", "--out-md", str(out)],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    # The command still emits JSON first; the trailing status line is for humans.
+    assert f"wrote Markdown kernel census: {out}" in proc.stdout
+    text = out.read_text(encoding="utf-8")
+    assert "# Kernel Census" in text
+    assert "cert4_d4" in text

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+from pathlib import Path
 
 from .zoo import ZOO, ZooInstance, run_instance
 
@@ -125,3 +126,85 @@ def run_kernel_census(*, include_noncontextual: bool = True) -> KernelCensusRepo
 
 def kernel_census_report_dict(*, include_noncontextual: bool = True) -> dict:
     return asdict(run_kernel_census(include_noncontextual=include_noncontextual))
+
+
+def _fmt(value: object) -> str:
+    if value is None:
+        return "-"
+    if value is True:
+        return "yes"
+    if value is False:
+        return "no"
+    return str(value)
+
+
+def _table(headers: list[str], rows: list[list[object]]) -> str:
+    if not rows:
+        return ""
+    head = "| " + " | ".join(headers) + " |"
+    sep = "| " + " | ".join("---" for _ in headers) + " |"
+    body = ["| " + " | ".join(_fmt(cell) for cell in row) + " |" for row in rows]
+    return "\n".join([head, sep, *body])
+
+
+def kernel_census_markdown(report: KernelCensusReport | dict) -> str:
+    """Render a kernel census report as Markdown."""
+    data = asdict(report) if isinstance(report, KernelCensusReport) else report
+    entries = data.get("entries", [])
+    summaries = data.get("summaries", [])
+
+    entry_rows = [
+        [
+            e.get("name"),
+            e.get("d"),
+            e.get("m"),
+            e.get("contextual"),
+            e.get("kernel_weight"),
+            e.get("n_minimal_kernels"),
+            e.get("obstruction_value"),
+            e.get("zd_avn_contextual"),
+        ]
+        for e in entries
+    ]
+    summary_rows = [
+        [
+            f"({s.get('d')},{s.get('m')})",
+            s.get("contextual_instances"),
+            s.get("noncontextual_instances"),
+            s.get("witnessed_min_kernel_weight"),
+            ", ".join(s.get("witness_names", []) or []),
+        ]
+        for s in summaries
+    ]
+
+    lines = [
+        "# Kernel Census",
+        "",
+        "## Scope",
+        "",
+        data.get("claim_scope", "-"),
+        "",
+        "## By `(d,m)`",
+        "",
+        _table(
+            ["d,m", "contextual", "non-contextual", "witnessed min K", "witnesses"],
+            summary_rows,
+        ),
+        "",
+        "## Instances",
+        "",
+        _table(
+            ["instance", "d", "m", "contextual", "K", "# min kernels", "value", "Z_d/AvN"],
+            entry_rows,
+        ),
+        "",
+        "## Non-Claims",
+        "",
+        "\n".join(f"- {item}" for item in data.get("non_claims", [])),
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def write_kernel_census_markdown(report: KernelCensusReport | dict, path: str | Path) -> None:
+    Path(path).write_text(kernel_census_markdown(report), encoding="utf-8")

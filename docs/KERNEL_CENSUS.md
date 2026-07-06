@@ -12,6 +12,7 @@ not prove a global K(d,m) lower bound.
 ```bash
 qkernel kernel-census
 qkernel kernel-census --contextual-only
+qkernel kernel-census --out-md kernel_census.md
 ```
 
 ## Python API

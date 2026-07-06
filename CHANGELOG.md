@@ -6,6 +6,7 @@
   Contextuality Benchmark Zoo.
 - New `kernel-census` CLI command reports per-instance kernel weights,
   multiplicities, obstruction values, and by-`(d,m)` witnessed minima.
+- Markdown rendering is available through `qkernel kernel-census --out-md`.
 - Added `docs/KERNEL_CENSUS.md` and `tests/test_kernel_census.py`.
 
 ## v0.52.0 — MagicScout research report generator
