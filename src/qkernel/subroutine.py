@@ -16,6 +16,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from .analyzer import analyze
+from .metadata import criterion_ledger
 from .ir import WeylProgram
 from .optimizer import compress_min_odd_q
 from .solvers import find_min_odd_cycle, find_all_min_odd_cycles, hamming_weight
@@ -33,6 +34,7 @@ class ContextualitySubroutineResult:
     obstruction_value: int | None           # resource value d/2 for even d (0 if non-contextual)
     modulus: int
     reason: str
+    criterion_ledger: dict | None = None
 
 
 def analyze_contextuality(
@@ -67,6 +69,13 @@ def analyze_contextuality(
             obstruction_value=0,
             modulus=d,
             reason="non-contextual: no odd-Q obstruction",
+            criterion_ledger=criterion_ledger(
+                criterion_id="odd_Q_even_d_v1",
+                verifier_used="analyze (odd-Q cycle obstruction)",
+                claim_scope="state_independent_parity_obstruction",
+                stronger_verifier_available="zd_avn_valuation_v1",
+                stronger_verifier_passed=None,
+            ),
         )
 
     lam = find_min_odd_cycle(program)
@@ -74,9 +83,12 @@ def analyze_contextuality(
     weight = hamming_weight(lam) if lam else None
 
     verified = True
+    zd_passed: bool | None = None
     if verify and lam is not None:
         kernel = compress_min_odd_q(program)
-        verified = verify_kernel(program, kernel).valid
+        vr = verify_kernel(program, kernel)
+        verified = vr.valid
+        zd_passed = vr.zd_contextual
 
     certified_minimal: bool | None = None
     if certify_minimal:
@@ -105,4 +117,12 @@ def analyze_contextuality(
         obstruction_value=obstruction_value,
         modulus=d,
         reason="contextual: minimal odd-Q kernel found",
+        criterion_ledger=criterion_ledger(
+            criterion_id="odd_Q_even_d_v1",
+            verifier_used=("verify_kernel (independent odd-Q re-check + Z_d/AvN valuation)"
+                           if verify else "find_min_odd_cycle (odd-Q, unverified)"),
+            claim_scope="state_independent_parity_obstruction; minimal contextuality kernel",
+            stronger_verifier_available="zd_avn_valuation_v1",
+            stronger_verifier_passed=zd_passed,
+        ),
     )

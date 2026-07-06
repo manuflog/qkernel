@@ -18,6 +18,7 @@ from .analyzer import analyze
 from .ir import WeylProgram
 from .pauli import pauli_string_to_vector
 from .solvers import find_all_min_odd_cycles, find_min_odd_cycle, hamming_weight
+from .metadata import criterion_ledger
 from .verify import verify_kernel
 from .optimizer import compress_min_odd_q
 
@@ -34,6 +35,7 @@ class ContextualityTest:
     n_observables: int          # distinct Paulis to calibrate
     obstruction_value: int      # resource value d/2
     verified: bool
+    criterion_ledger: dict | None = None
 
 
 def _build_context_program(paulis: list[str]):
@@ -89,15 +91,24 @@ def minimal_contextuality_tests(paulis: list[str], *, top: int = 3) -> list[Cont
         kernel = compress_min_odd_q(
             WeylProgram(d=d, m=program.m, observables=program.observables, contexts=sel)
         )
-        verified = verify_kernel(
+        vr = verify_kernel(
             WeylProgram(d=d, m=program.m, observables=program.observables, contexts=sel), kernel
-        ).valid
+        )
+        verified = vr.valid
+        ledger = criterion_ledger(
+            criterion_id="odd_Q_even_d_v1",
+            verifier_used="verify_kernel (independent odd-Q re-check + Z_d/AvN valuation)",
+            claim_scope="state_independent contextuality test (cheapest measurement settings)",
+            stronger_verifier_available="zd_avn_valuation_v1",
+            stronger_verifier_passed=vr.zd_contextual,
+        )
         tests.append(ContextualityTest(
             contexts=sel,
             n_contexts=len(sel),
             n_observables=len(obs),
             obstruction_value=d // 2,
             verified=verified,
+            criterion_ledger=ledger,
         ))
 
     tests.sort(key=lambda t: (t.n_contexts, t.n_observables))

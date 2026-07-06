@@ -3,8 +3,11 @@
 A base Weyl family that is **non-contextual** under the state-independent odd-Q
 criterion can become **contextual** after passive embedding into twice the local
 dimension (`d -> 2d`). The embedded family is the **fiber pool**: the union, over
-base contexts, of every valid `d -> 2d` lift of that context. Lifting is a free,
-passive operation (no entangling gates), so this exhibits contextuality as a
+base contexts, of every valid `d -> 2d` lift of that context. Lifting is a
+label-level passive embedding in the mathematical model (a relabeling of Weyl
+indices; no entangling gates appear in the label algebra). qkernel makes no
+claim that this embedding is free as a physical or compiler resource (see the
+README scope box). Under the odd-Q criterion this exhibits contextuality as a
 resource *activated* by embedding.
 
 ## Usage

@@ -3,9 +3,11 @@
 A base Weyl family that is *non-contextual* under the state-independent odd-Q
 criterion can become *contextual* after passive embedding into twice the local
 dimension. The embedded family is the *fiber pool*: the union, over base
-contexts, of every valid d -> 2d lift of that context. Lifting is a free,
-passive operation (no entangling gates), so this exhibits contextuality as a
-resource that is *activated* by embedding.
+contexts, of every valid d -> 2d lift of that context. Lifting is a
+label-level passive embedding in the mathematical model (a relabeling of Weyl
+indices; no entangling gates appear in the label algebra). qkernel makes no
+claim that this embedding is free as a physical or compiler resource; see the
+scope box in the README.
 
 The activation verdict here is direct and criterion-consistent: it compares
 ``analyze`` (the odd-Q obstruction) on the base at d against ``analyze`` on the
@@ -156,11 +158,14 @@ class ActivationReport:
     base_contexts: int
     fiber_contexts: int
     reason: str
+    criterion_ledger: dict | None = None
 
 
 def activation_report(base: WeylProgram) -> ActivationReport:
     """Report whether embedding d -> 2d activates contextuality: base non-contextual
     (odd-Q) but fiber pool contextual (odd-Q), under the same criterion."""
+    from .metadata import criterion_ledger
+
     base_ctx = analyze(base).contextual
     pool = build_fiber_pool(base)
     fiber_ctx = analyze(pool).contextual
@@ -171,6 +176,13 @@ def activation_report(base: WeylProgram) -> ActivationReport:
         reason = "base already contextual; embedding does not activate (nothing to activate)"
     else:
         reason = "no activation: base and fiber pool both non-contextual"
+    ledger = criterion_ledger(
+        criterion_id="odd_Q_even_d_v1",
+        verifier_used="analyze (odd-Q cycle obstruction), base and fiber pool",
+        claim_scope="state_independent_parity_obstruction; odd-Q contextuality activation",
+        stronger_verifier_available="zd_avn_valuation_v1",
+        stronger_verifier_passed=None,
+    )
     return ActivationReport(
         base_d=base.d,
         fiber_d=2 * base.d,
@@ -180,6 +192,7 @@ def activation_report(base: WeylProgram) -> ActivationReport:
         base_contexts=len(base.contexts),
         fiber_contexts=len(pool.contexts),
         reason=reason,
+        criterion_ledger=ledger,
     )
 
 
@@ -195,12 +208,14 @@ class ActivatedResource:
     obstruction_value: int | None           # resource value (fiber d)/2
     verified: bool
     reason: str
+    criterion_ledger: dict | None = None
 
 
 def activated_resource(base: WeylProgram) -> ActivatedResource:
     """Contextuality-as-a-resource via embedding: if a non-contextual base activates
     under d -> 2d embedding, extract the cheapest activated contextuality test (the
     minimal odd-Q kernel of the fiber pool) as concrete fiber measurement settings."""
+    from .metadata import criterion_ledger
     from .optimizer import compress_min_odd_q
 
     base_ctx = analyze(base).contextual
@@ -211,11 +226,18 @@ def activated_resource(base: WeylProgram) -> ActivatedResource:
     if not activated:
         reason = ("base already contextual; nothing to activate" if base_ctx
                   else "no activation: fiber pool is non-contextual")
+        ledger = criterion_ledger(
+            criterion_id="odd_Q_even_d_v1",
+            verifier_used="analyze (odd-Q cycle obstruction), base and fiber pool",
+            claim_scope="state_independent_parity_obstruction",
+            stronger_verifier_available="zd_avn_valuation_v1",
+            stronger_verifier_passed=None,
+        )
         return ActivatedResource(
             activated=False, base_d=base.d, fiber_d=2 * base.d,
             base_contextual=base_ctx, fiber_contextual=fiber_ctx,
             test_contexts=None, test_weight=None, obstruction_value=None,
-            verified=True, reason=reason,
+            verified=True, reason=reason, criterion_ledger=ledger,
         )
 
     from .incidence import build_incidence
@@ -239,10 +261,29 @@ def activated_resource(base: WeylProgram) -> ActivatedResource:
     odd_carry = sum(b[i] * lam[i] for i in range(len(pool.contexts))) % 2 == 1
     verified = bool(even and odd_carry)
 
+    # Criterion ledger: run the strictly stronger Z_d/AvN valuation check on the
+    # activated sub-family so that its pass/fail is recorded rather than implied.
+    stronger_passed: bool | None
+    try:
+        from .valuation import check_kernel_zd_valuation
+
+        zd = check_kernel_zd_valuation(pool, kernel)
+        stronger_passed = (zd.status == "contextual") if zd.status != "unknown" else None
+    except Exception:
+        stronger_passed = None
+    ledger = criterion_ledger(
+        criterion_id="odd_Q_even_d_v1",
+        verifier_used="odd-Q cycle obstruction on the minimal fiber kernel",
+        claim_scope="state_independent_parity_obstruction; odd-Q contextuality activation",
+        stronger_verifier_available="zd_avn_valuation_v1",
+        stronger_verifier_passed=stronger_passed,
+    )
+
     return ActivatedResource(
         activated=True, base_d=base.d, fiber_d=2 * base.d,
         base_contextual=False, fiber_contextual=True,
         test_contexts=selected, test_weight=weight,
         obstruction_value=pool.d // 2, verified=verified,
         reason="activated: non-contextual base yields an odd-Q contextuality resource under d->2d embedding",
+        criterion_ledger=ledger,
     )
