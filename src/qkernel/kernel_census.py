@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
+from typing import Any
 
 from .zoo import ZOO, ZooInstance, run_instance
 
@@ -42,10 +44,23 @@ class CensusSummary:
 
 
 @dataclass(frozen=True)
+class KernelTheoremPin:
+    d: int
+    m: int
+    K: int
+    theorem_id: str
+    source: str
+    proof_method: str
+    verifier: str | None = None
+    notes: str = ""
+
+
+@dataclass(frozen=True)
 class KernelCensusReport:
     schema: str
     entries: list[CensusEntry]
     summaries: list[CensusSummary]
+    theorem_pins: list[KernelTheoremPin]
     claim_scope: str
     non_claims: list[str]
 
@@ -73,10 +88,11 @@ def _entry(inst: ZooInstance) -> CensusEntry:
     )
 
 
-def _summaries(entries: list[CensusEntry]) -> list[CensusSummary]:
+def _summaries(entries: list[CensusEntry], theorem_pins: list[KernelTheoremPin]) -> list[CensusSummary]:
     grouped: dict[tuple[int, int], list[CensusEntry]] = {}
     for entry in entries:
         grouped.setdefault((entry.d, entry.m), []).append(entry)
+    pins_by_dm = {(pin.d, pin.m): pin for pin in theorem_pins}
 
     out: list[CensusSummary] = []
     for (d, m), group in sorted(grouped.items()):
@@ -85,6 +101,28 @@ def _summaries(entries: list[CensusEntry]) -> list[CensusSummary]:
         weights = [e.kernel_weight for e in contextual if e.kernel_weight is not None]
         min_weight = min(weights) if weights else None
         witnesses = sorted(e.name for e in contextual if e.kernel_weight == min_weight)
+        pin = pins_by_dm.get((d, m))
+        if pin is None:
+            global_K_proven = False
+            global_K_value = None
+            proof_obligations = [
+                "exhaust all relevant Weyl/context-family shapes or cite a checked classification",
+                "prove no contextual family exists below the witnessed kernel weight",
+                "attach machine-checkable MILP/CP-SAT certificates or a mathematical lower-bound proof",
+                "pin the theorem source before reporting a global K(d,m) value",
+            ]
+            claim_scope = (
+                "witnessed minimum among registered zoo instances only; "
+                "not a proof of global K(d,m) unless supplied by an external theorem"
+            )
+        else:
+            global_K_proven = True
+            global_K_value = pin.K
+            proof_obligations = []
+            claim_scope = (
+                f"global K({d},{m})={pin.K} pinned by theorem {pin.theorem_id}; "
+                f"source={pin.source}; proof_method={pin.proof_method}"
+            )
         out.append(CensusSummary(
             d=d,
             m=m,
@@ -92,23 +130,54 @@ def _summaries(entries: list[CensusEntry]) -> list[CensusSummary]:
             noncontextual_instances=len(noncontextual),
             witnessed_min_kernel_weight=min_weight,
             witness_names=witnesses,
-            global_K_proven=False,
-            global_K_value=None,
-            proof_obligations=[
-                "exhaust all relevant Weyl/context-family shapes or cite a checked classification",
-                "prove no contextual family exists below the witnessed kernel weight",
-                "attach machine-checkable MILP/CP-SAT certificates or a mathematical lower-bound proof",
-                "pin the theorem source before reporting a global K(d,m) value",
-            ],
-            claim_scope=(
-                "witnessed minimum among registered zoo instances only; "
-                "not a proof of global K(d,m) unless supplied by an external theorem"
-            ),
+            global_K_proven=global_K_proven,
+            global_K_value=global_K_value,
+            proof_obligations=proof_obligations,
+            claim_scope=claim_scope,
         ))
     return out
 
 
-def run_kernel_census(*, include_noncontextual: bool = True) -> KernelCensusReport:
+def _theorem_pin_from_dict(item: dict[str, Any]) -> KernelTheoremPin:
+    required = ["d", "m", "K", "theorem_id", "source", "proof_method"]
+    missing = [key for key in required if key not in item]
+    if missing:
+        raise ValueError(f"kernel theorem pin missing required field(s): {', '.join(missing)}")
+    pin = KernelTheoremPin(
+        d=int(item["d"]),
+        m=int(item["m"]),
+        K=int(item["K"]),
+        theorem_id=str(item["theorem_id"]),
+        source=str(item["source"]),
+        proof_method=str(item["proof_method"]),
+        verifier=str(item["verifier"]) if item.get("verifier") is not None else None,
+        notes=str(item.get("notes", "")),
+    )
+    if pin.d <= 0 or pin.m <= 0 or pin.K <= 0:
+        raise ValueError("kernel theorem pins require positive d, m, and K")
+    return pin
+
+
+def load_kernel_theorem_pins(path: str | Path) -> list[KernelTheoremPin]:
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    pins_data = data.get("theorem_pins", data)
+    if not isinstance(pins_data, list):
+        raise ValueError("kernel theorem pin file must be a list or contain a `theorem_pins` list")
+    pins = [_theorem_pin_from_dict(item) for item in pins_data]
+    seen: set[tuple[int, int]] = set()
+    for pin in pins:
+        key = (pin.d, pin.m)
+        if key in seen:
+            raise ValueError(f"duplicate theorem pin for d={pin.d}, m={pin.m}")
+        seen.add(key)
+    return pins
+
+
+def run_kernel_census(
+    *,
+    include_noncontextual: bool = True,
+    theorem_pins: list[KernelTheoremPin] | None = None,
+) -> KernelCensusReport:
     """Run a conservative minimal-kernel census over the benchmark zoo.
 
     This pins known small examples and their minimal-kernel statistics. It does
@@ -117,11 +186,13 @@ def run_kernel_census(*, include_noncontextual: bool = True) -> KernelCensusRepo
     entries = [_entry(inst) for inst in ZOO]
     if not include_noncontextual:
         entries = [entry for entry in entries if entry.contextual]
+    pins = list(theorem_pins or [])
 
     return KernelCensusReport(
         schema=SCHEMA_VERSION,
         entries=entries,
-        summaries=_summaries(entries),
+        summaries=_summaries(entries, pins),
+        theorem_pins=pins,
         claim_scope=(
             "registered-instance census for qkernel's benchmark zoo; "
             "safe input to K(d,m) theorem/proof work, not a full-family classification"
@@ -135,8 +206,15 @@ def run_kernel_census(*, include_noncontextual: bool = True) -> KernelCensusRepo
     )
 
 
-def kernel_census_report_dict(*, include_noncontextual: bool = True) -> dict:
-    return asdict(run_kernel_census(include_noncontextual=include_noncontextual))
+def kernel_census_report_dict(
+    *,
+    include_noncontextual: bool = True,
+    theorem_pins: list[KernelTheoremPin] | None = None,
+) -> dict:
+    return asdict(run_kernel_census(
+        include_noncontextual=include_noncontextual,
+        theorem_pins=theorem_pins,
+    ))
 
 
 def _fmt(value: object) -> str:
@@ -163,6 +241,7 @@ def kernel_census_markdown(report: KernelCensusReport | dict) -> str:
     data = asdict(report) if isinstance(report, KernelCensusReport) else report
     entries = data.get("entries", [])
     summaries = data.get("summaries", [])
+    theorem_pins = data.get("theorem_pins", [])
 
     entry_rows = [
         [
@@ -209,6 +288,23 @@ def kernel_census_markdown(report: KernelCensusReport | dict) -> str:
             f"- ({s.get('d')},{s.get('m')}): " + "; ".join(s.get("proof_obligations", []) or [])
             for s in summaries
         ) or "-",
+        "",
+        "## Theorem Pins",
+        "",
+        _table(
+            ["d,m", "K", "theorem", "source", "method", "verifier"],
+            [
+                [
+                    f"({pin.get('d')},{pin.get('m')})",
+                    pin.get("K"),
+                    pin.get("theorem_id"),
+                    pin.get("source"),
+                    pin.get("proof_method"),
+                    pin.get("verifier"),
+                ]
+                for pin in theorem_pins
+            ],
+        ) or "No global K(d,m) theorem pins supplied.",
         "",
         "## Instances",
         "",

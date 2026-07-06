@@ -11,6 +11,7 @@ def test_package_metadata_files_exist():
         "MANIFEST.in",
         "CHANGELOG.md",
         "docs/KERNEL_CENSUS.md",
+        "examples/kernel_theorem_pins.json",
         "src/qkernel/kernel_census.py",
         "src/qkernel/py.typed",
     ]:

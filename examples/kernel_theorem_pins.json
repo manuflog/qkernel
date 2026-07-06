@@ -1,0 +1,14 @@
+{
+  "theorem_pins": [
+    {
+      "d": 4,
+      "m": 2,
+      "K": 6,
+      "theorem_id": "K42_MINIMAL_CERTIFICATE",
+      "source": "research-atlas-v7/FKC",
+      "proof_method": "odd-K parity lemma + K=4 shape classification + exhaustive K4-configuration search",
+      "verifier": "external proof record",
+      "notes": "Example pin format for externally proven K(d,m) values; qkernel records but does not derive this theorem."
+    }
+  ]
+}

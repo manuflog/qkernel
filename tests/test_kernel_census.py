@@ -3,7 +3,11 @@ import subprocess
 import sys
 from pathlib import Path
 
-from qkernel.kernel_census import kernel_census_markdown, kernel_census_report_dict
+from qkernel.kernel_census import (
+    kernel_census_markdown,
+    kernel_census_report_dict,
+    load_kernel_theorem_pins,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -50,12 +54,27 @@ def test_cli_kernel_census_contextual_only():
     assert all(entry["contextual"] for entry in data["entries"])
 
 
+def test_kernel_census_accepts_external_theorem_pins():
+    pins = load_kernel_theorem_pins(ROOT / "examples/kernel_theorem_pins.json")
+    data = kernel_census_report_dict(theorem_pins=pins)
+    summary = {(s["d"], s["m"]): s for s in data["summaries"]}[(4, 2)]
+
+    assert data["theorem_pins"][0]["theorem_id"] == "K42_MINIMAL_CERTIFICATE"
+    assert summary["global_K_proven"] is True
+    assert summary["global_K_value"] == 6
+    assert summary["proof_obligations"] == []
+    assert "K(4,2)=6" in summary["claim_scope"]
+
+
 def test_kernel_census_markdown_contains_scope_and_tables():
-    md = kernel_census_markdown(kernel_census_report_dict())
+    pins = load_kernel_theorem_pins(ROOT / "examples/kernel_theorem_pins.json")
+    md = kernel_census_markdown(kernel_census_report_dict(theorem_pins=pins))
 
     assert "# Kernel Census" in md
     assert "## By `(d,m)`" in md
     assert "## Proof Obligations" in md
+    assert "## Theorem Pins" in md
+    assert "K42_MINIMAL_CERTIFICATE" in md
     assert "peres_mermin" in md
     assert "does not prove global K(d,m) lower bounds" in md
 
@@ -75,3 +94,25 @@ def test_cli_kernel_census_writes_markdown(tmp_path):
     text = out.read_text(encoding="utf-8")
     assert "# Kernel Census" in text
     assert "cert4_d4" in text
+
+
+def test_cli_kernel_census_with_theorem_pins():
+    proc = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "qkernel.cli",
+            "kernel-census",
+            "--theorem-pins",
+            str(ROOT / "examples/kernel_theorem_pins.json"),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    data = json.loads(proc.stdout)
+    summary = {(s["d"], s["m"]): s for s in data["summaries"]}[(4, 2)]
+    assert summary["global_K_proven"] is True
+    assert data["theorem_pins"][0]["K"] == 6

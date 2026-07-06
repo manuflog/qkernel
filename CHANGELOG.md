@@ -10,6 +10,8 @@
 - Summaries include explicit `global_K_proven`, `global_K_value`, and
   `proof_obligations` fields so witnessed zoo minima cannot be confused with
   full K(d,m) theorems.
+- Optional theorem-pin JSON files can merge externally proven K(d,m) values into
+  the census with source, proof method, verifier, and notes preserved.
 - Added `docs/KERNEL_CENSUS.md` and `tests/test_kernel_census.py`.
 
 ## v0.52.0 — MagicScout research report generator

@@ -12,6 +12,7 @@ not prove a global K(d,m) lower bound.
 ```bash
 qkernel kernel-census
 qkernel kernel-census --contextual-only
+qkernel kernel-census --theorem-pins examples/kernel_theorem_pins.json
 qkernel kernel-census --out-md kernel_census.md
 ```
 
@@ -51,6 +52,32 @@ proof_obligations
 These fields are deliberately unset until a theorem source, exhaustive
 classification, or machine-checkable certificate proves a full-family K(d,m)
 claim.
+
+## Theorem Pins
+
+External K(d,m) proofs can be recorded in a JSON file and merged into the census:
+
+```json
+{
+  "theorem_pins": [
+    {
+      "d": 4,
+      "m": 2,
+      "K": 6,
+      "theorem_id": "K42_MINIMAL_CERTIFICATE",
+      "source": "research-atlas-v7/FKC",
+      "proof_method": "odd-K parity lemma + K=4 shape classification + exhaustive K4-configuration search",
+      "verifier": "external proof record",
+      "notes": "qkernel records but does not derive this theorem"
+    }
+  ]
+}
+```
+
+Supplying a theorem pin sets `global_K_proven=true` for that `(d,m)` summary and
+records the theorem metadata. Pins are externally sourced: qkernel validates the
+metadata shape and keeps the claim boundary visible, but it does not turn a pin
+into an internal proof.
 
 ## Non-Claims
 
