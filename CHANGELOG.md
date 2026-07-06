@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.41.0 — Contextuality Benchmark Zoo
+
+- New `qkernel.zoo`: a curated registry of small contextuality instances with
+  *expected* verdicts, pinned per criterion and enforced by the test suite —
+  a permanent regression harness and research artifact. Instances:
+  `peres_mermin` (kernel 6, exactly 1 minimal kernel, Z_d verified),
+  `noisy_peres_mermin` (kernel extraction from 40 irrelevant contexts),
+  `doily_two_qubit` (GQ(2,2): kernel 6, exactly **10** minimal kernels — the
+  doily's 10 Mermin squares), `single_context` (non-contextual),
+  `odd_d_qutrit` (the odd-Q *shadow trap*: criterion identically zero for odd
+  d; no parity claim licensed), and `cert4_d4` (the verified minimal d=4
+  certificate, obstruction value 2, Z_d verified).
+- Recorded fact worth pinning: naive 2x scaling of the PM square into d=4 is
+  **non-contextual** under the odd-Q criterion — genuine d=4 value-2
+  contextuality requires the cert4 family, not a rescaled PM.
+- Each instance declares its `claim_scope`; zoo checks include the criterion
+  ledger's `stronger_verifier_passed` where pinned.
+
 ## v0.40.0 — Backend-Aware Experiment Design
 
 - New `qkernel.backend_design`: rank contextuality tests by **expected
