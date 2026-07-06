@@ -173,6 +173,32 @@ def load_kernel_theorem_pins(path: str | Path) -> list[KernelTheoremPin]:
     return pins
 
 
+def _validate_theorem_pins_against_entries(
+    pins: list[KernelTheoremPin],
+    entries: list[CensusEntry],
+) -> None:
+    witnessed: dict[tuple[int, int], tuple[int, list[str]]] = {}
+    for entry in entries:
+        if not entry.contextual or entry.kernel_weight is None:
+            continue
+        key = (entry.d, entry.m)
+        if key not in witnessed or entry.kernel_weight < witnessed[key][0]:
+            witnessed[key] = (entry.kernel_weight, [entry.name])
+        elif entry.kernel_weight == witnessed[key][0]:
+            witnessed[key][1].append(entry.name)
+
+    for pin in pins:
+        witness = witnessed.get((pin.d, pin.m))
+        if witness is None:
+            continue
+        witnessed_weight, names = witness
+        if pin.K > witnessed_weight:
+            raise ValueError(
+                f"theorem pin {pin.theorem_id} claims K({pin.d},{pin.m})={pin.K}, "
+                f"but zoo witness(es) {sorted(names)} have kernel weight {witnessed_weight}"
+            )
+
+
 def run_kernel_census(
     *,
     include_noncontextual: bool = True,
@@ -187,6 +213,7 @@ def run_kernel_census(
     if not include_noncontextual:
         entries = [entry for entry in entries if entry.contextual]
     pins = list(theorem_pins or [])
+    _validate_theorem_pins_against_entries(pins, entries)
 
     return KernelCensusReport(
         schema=SCHEMA_VERSION,

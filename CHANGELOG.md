@@ -12,6 +12,8 @@
   full K(d,m) theorems.
 - Optional theorem-pin JSON files can merge externally proven K(d,m) values into
   the census with source, proof method, verifier, and notes preserved.
+- Theorem pins are rejected if they claim a K(d,m) value larger than an already
+  witnessed zoo kernel for the same `(d,m)`.
 - Added `docs/KERNEL_CENSUS.md` and `tests/test_kernel_census.py`.
 
 ## v0.52.0 — MagicScout research report generator

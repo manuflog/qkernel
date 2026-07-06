@@ -79,6 +79,10 @@ records the theorem metadata. Pins are externally sourced: qkernel validates the
 metadata shape and keeps the claim boundary visible, but it does not turn a pin
 into an internal proof.
 
+Pins are also checked against registered zoo witnesses. A pin claiming
+`K(d,m)` larger than an already witnessed contextual kernel weight is rejected
+as inconsistent with current qkernel evidence.
+
 ## Non-Claims
 
 The census does not claim:

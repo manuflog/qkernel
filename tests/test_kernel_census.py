@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 
 from qkernel.kernel_census import (
+    KernelTheoremPin,
     kernel_census_markdown,
     kernel_census_report_dict,
     load_kernel_theorem_pins,
@@ -64,6 +65,24 @@ def test_kernel_census_accepts_external_theorem_pins():
     assert summary["global_K_value"] == 6
     assert summary["proof_obligations"] == []
     assert "K(4,2)=6" in summary["claim_scope"]
+
+
+def test_kernel_census_rejects_pin_contradicting_zoo_witness():
+    bad_pin = KernelTheoremPin(
+        d=4,
+        m=2,
+        K=7,
+        theorem_id="bad",
+        source="test",
+        proof_method="contradicts cert4_d4",
+    )
+    try:
+        kernel_census_report_dict(theorem_pins=[bad_pin])
+    except ValueError as exc:
+        assert "cert4_d4" in str(exc)
+        assert "kernel weight 6" in str(exc)
+    else:
+        raise AssertionError("contradictory theorem pin must be rejected")
 
 
 def test_kernel_census_markdown_contains_scope_and_tables():
