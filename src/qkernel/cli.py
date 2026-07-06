@@ -26,6 +26,7 @@ from .release_audit import run_release_audit, release_audit_dict, write_release_
 from .github_ready import run_github_ready_check, github_ready_report_dict, write_github_ready_report
 from .backends.pysat_backend import OptionalBackendUnavailable, solve_sat_with_pysat, solve_maxsat_with_rc2
 from .compiler import compiler_report_dict, compare_compiler_pass_dict
+from .resource_features import resource_feature_report_dict
 from .selftest import run_selftest_dict
 from .rewrite_policy import list_rewrite_policies_dict, assess_rewrite_candidate_dict
 from .valuation import check_zd_valuation, check_kernel_zd_valuation, two_primary_report, spectrum_summary
@@ -298,6 +299,13 @@ def main() -> None:
     compare_pass_cmd.add_argument("before")
     compare_pass_cmd.add_argument("after")
     compare_pass_cmd.add_argument("--input", choices=["weyl", "pauli", "schedule", "table", "stim-lite", "qiskit-lite"], default="weyl")
+
+    resource_features_cmd = sub.add_parser("resource-features", help="export conservative feature vector for external resource estimators")
+    resource_features_cmd.add_argument("path")
+    resource_features_cmd.add_argument("--input", choices=["weyl", "pauli", "schedule", "table", "stim-lite", "qiskit-lite"], default="weyl")
+    resource_features_cmd.add_argument("--enumerate", action="store_true", help="include minimal-kernel multiplicity when cycle dimension is small")
+    resource_features_cmd.add_argument("--certify-minimal", action="store_true", help="ask optional CP-SAT backend to certify minimality")
+    resource_features_cmd.add_argument("--include-certificate-features", action="store_true", help="include certificate hash and selected kernel labels")
 
     pysat_cmd = sub.add_parser("solve-pysat", help="optional PySAT fixed-k feasibility backend")
     pysat_cmd.add_argument("path")
@@ -734,6 +742,15 @@ def main() -> None:
         before = _load_by_kind(args.before, args.input)
         after = _load_by_kind(args.after, args.input)
         print(json.dumps(compare_compiler_pass_dict(before, after), indent=2))
+
+    elif args.command == "resource-features":
+        program = _load_by_kind(args.path, args.input)
+        print(json.dumps(resource_feature_report_dict(
+            program,
+            enumerate_all_kernels=args.enumerate,
+            certify_minimal=args.certify_minimal,
+            include_certificate_features=args.include_certificate_features,
+        ), indent=2))
 
     elif args.command == "solve-pysat":
         program = _load_by_kind(args.path, args.input)

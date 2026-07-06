@@ -10,6 +10,8 @@ def test_package_metadata_files_exist():
         "CITATION.cff",
         "MANIFEST.in",
         "CHANGELOG.md",
+        "docs/RESOURCE_FEATURES.md",
+        "src/qkernel/resource_features.py",
         "src/qkernel/py.typed",
     ]:
         assert (ROOT / rel).exists()

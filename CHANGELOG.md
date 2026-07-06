@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — Resource feature export bridge
+
+- Added `qkernel.resource_features`: a conservative feature-vector export for
+  external resource-estimation studies.
+- New `resource-features` CLI command reports verified contextuality/kernel
+  features, required external oracles, criterion ledger, and explicit non-claims.
+- Added `docs/RESOURCE_FEATURES.md` and `tests/test_resource_features.py`.
+
 ## v0.52.0 — MagicScout research report generator
 
 - New `qkernel.magic_report`: Markdown report generator for single MagicScout
