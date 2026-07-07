@@ -114,6 +114,7 @@ def test_application_packet_markdown_preserves_claim_gates():
 
 def test_cli_application_packet_writes_markdown(tmp_path):
     out = tmp_path / "packet.md"
+    json_out = tmp_path / "packet.json"
     proc = subprocess.run(
         [
             sys.executable,
@@ -123,6 +124,8 @@ def test_cli_application_packet_writes_markdown(tmp_path):
             str(ROOT / "examples/application_packet_demo.json"),
             "--out-md",
             str(out),
+            "--out-json",
+            str(json_out),
         ],
         cwd=ROOT,
         capture_output=True,
@@ -131,8 +134,12 @@ def test_cli_application_packet_writes_markdown(tmp_path):
     )
 
     assert f"wrote Markdown application evidence packet: {out}" in proc.stdout
+    assert f"wrote JSON application evidence packet: {json_out}" in proc.stdout
     data = json.loads(proc.stdout.split("\nwrote Markdown application evidence packet:", 1)[0])
+    artifact = json.loads(json_out.read_text(encoding="utf-8"))
     assert data["summary"]["sources_with_blockers"] >= 1
+    assert artifact["summary"] == data["summary"]
+    assert artifact["candidate_coverage"] == data["candidate_coverage"]
     assert "Application Workbench Demo Packet" in out.read_text(encoding="utf-8")
 
 

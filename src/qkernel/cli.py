@@ -406,6 +406,7 @@ def main() -> None:
     application_packet_cmd = sub.add_parser("application-packet", help="render a qkernel application evidence packet")
     application_packet_cmd.add_argument("path")
     application_packet_cmd.add_argument("--out-md", help="optional Markdown evidence packet path")
+    application_packet_cmd.add_argument("--out-json", help="optional JSON evidence packet path")
     application_packet_cmd.add_argument(
         "--fail-on-blocked",
         action="store_true",
@@ -939,11 +940,18 @@ def main() -> None:
     elif args.command == "application-packet":
         packet = application_evidence_packet(args.path)
         data = application_evidence_packet_dict(packet)
+        json_text = json.dumps(data, indent=2)
         if args.out_md:
             write_application_evidence_packet_markdown(packet, args.out_md)
-        print(json.dumps(data, indent=2))
+        if args.out_json:
+            with open(args.out_json, "w", encoding="utf-8") as fh:
+                fh.write(json_text)
+                fh.write("\n")
+        print(json_text)
         if args.out_md:
             print(f"wrote Markdown application evidence packet: {args.out_md}")
+        if args.out_json:
+            print(f"wrote JSON application evidence packet: {args.out_json}")
         if args.fail_on_blocked and not data["summary"]["ready_for_claims"]:
             print("application evidence packet claim gates blocked", file=sys.stderr)
             raise SystemExit(1)

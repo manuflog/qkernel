@@ -10,6 +10,7 @@ Run:
 ```bash
 qkernel application-packet examples/application_packet_demo.json
 qkernel application-packet examples/application_packet_demo.json --out-md packet.md
+qkernel application-packet examples/application_packet_demo.json --out-json packet.json
 qkernel application-packet examples/application_packet_demo.json --fail-on-blocked
 ```
 
@@ -63,3 +64,4 @@ circuit manifests are hardware-ready circuits.
 
 Use `--fail-on-blocked` in CI or PR checks when a packet should block merging
 unless every required evidence source is loaded and every claim gate is ready.
+Use `--out-json` to persist the full machine-readable packet as a CI artifact.

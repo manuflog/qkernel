@@ -56,6 +56,8 @@
   blockers.
 - `application-packet --fail-on-blocked` can now turn blocked claim gates into a
   nonzero CLI exit for CI or PR review automation.
+- `application-packet --out-json` can now write the full machine-readable packet
+  as a CI or review artifact.
 - The development extra includes `numpy>=1.26`, matching test paths that import
   the Qiskit protocol exporter.
 - Added `docs/KERNEL_CENSUS.md` and `tests/test_kernel_census.py`.
