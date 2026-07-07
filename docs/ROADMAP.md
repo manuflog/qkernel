@@ -40,9 +40,15 @@ semantics (shared `observable` vs independent `event` scope) are verified
 - [x] composable contextuality subroutine (`qkernel.subroutine.analyze_contextuality`) for pipeline integration.
 - [x] experiment-design application (`minimal-test`): device Paulis -> cheapest contextuality test.
 - [x] activation-as-resource-generation (`activation-resource`): cheapest test activated by embedding.
-- [ ] comparison with T-count, T-depth, magic injections, stabilizer rank (open; needs an external resource oracle).
+- [x] resource-oracle feature bridge (`resource-features`): exports qkernel kernel
+      features next to externally supplied T-count, T-depth, magic-injection, or
+      stabilizer-rank metrics without claiming qkernel predicts them.
+- [x] staged PRD for compiler, magic-state, optimizer, circuit-builder, and
+      factory-candidate development (`docs/PRD_COMPILER_MAGIC_FACTORY_BRIDGE.md`).
+- [ ] validated correlation study over an external resource-oracle corpus.
 
 ## Status
 
-Phases 1-3 complete; Phase 4 applications delivered (the resource-overhead comparison remains open).
+Phases 1-3 complete; Phase 4 applications delivered. The resource-oracle bridge
+is present; validated resource-overhead correlation remains open.
 Solver stack: span / bounded-weight / branch-bound / heuristic / CP-SAT (see docs/SOLVERS.md).

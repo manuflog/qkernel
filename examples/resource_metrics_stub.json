@@ -1,0 +1,12 @@
+{
+  "schema": "qkernel.external_resource_metrics.v1",
+  "external_resource_metrics": {
+    "program_id": "peres_mermin_probe",
+    "source": "external-resource-oracle-placeholder",
+    "t_count": null,
+    "t_depth": null,
+    "magic_injections": null,
+    "stabilizer_rank": null,
+    "notes": "Placeholder schema example. Fill these fields only with metrics computed by an external compiler/resource oracle."
+  }
+}

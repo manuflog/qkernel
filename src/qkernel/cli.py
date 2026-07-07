@@ -34,6 +34,12 @@ from .kernel_census import (
 )
 from .selftest import run_selftest_dict
 from .rewrite_policy import list_rewrite_policies_dict, assess_rewrite_candidate_dict
+from .resource_oracle import (
+    load_external_resource_metrics,
+    resource_feature_report,
+    resource_oracle_report_dict,
+    write_resource_oracle_markdown,
+)
 from .valuation import check_zd_valuation, check_kernel_zd_valuation, two_primary_report, spectrum_summary
 from .export_circuit import export_qiskit_protocol
 from .magic import (
@@ -330,6 +336,13 @@ def main() -> None:
     compare_pass_cmd.add_argument("before")
     compare_pass_cmd.add_argument("after")
     compare_pass_cmd.add_argument("--input", choices=["weyl", "pauli", "schedule", "table", "stim-lite", "qiskit-lite"], default="weyl")
+
+    resource_features_cmd = sub.add_parser("resource-features", help="export qkernel features for external resource-oracle comparison")
+    resource_features_cmd.add_argument("path")
+    resource_features_cmd.add_argument("--input", choices=["weyl", "pauli", "schedule", "table", "stim-lite", "qiskit-lite"], default="weyl")
+    resource_features_cmd.add_argument("--program-id", default="program")
+    resource_features_cmd.add_argument("--resource-metrics", help="optional external resource metrics JSON file")
+    resource_features_cmd.add_argument("--out-md", help="optional Markdown report path")
 
     pysat_cmd = sub.add_parser("solve-pysat", help="optional PySAT fixed-k feasibility backend")
     pysat_cmd.add_argument("path")
@@ -781,6 +794,17 @@ def main() -> None:
         before = _load_by_kind(args.before, args.input)
         after = _load_by_kind(args.after, args.input)
         print(json.dumps(compare_compiler_pass_dict(before, after), indent=2))
+
+    elif args.command == "resource-features":
+        program = _load_by_kind(args.path, args.input)
+        metrics = load_external_resource_metrics(args.resource_metrics) if args.resource_metrics else None
+        report = resource_feature_report(program, program_id=args.program_id, external_metrics=metrics)
+        data = resource_oracle_report_dict(report)
+        if args.out_md:
+            write_resource_oracle_markdown(report, args.out_md)
+        print(json.dumps(data, indent=2))
+        if args.out_md:
+            print(f"wrote Markdown resource feature report: {args.out_md}")
 
     elif args.command == "solve-pysat":
         program = _load_by_kind(args.path, args.input)

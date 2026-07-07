@@ -11,9 +11,13 @@ def test_package_metadata_files_exist():
         "MANIFEST.in",
         "CHANGELOG.md",
         "docs/KERNEL_CENSUS.md",
+        "docs/RESOURCE_ORACLE.md",
+        "docs/PRD_COMPILER_MAGIC_FACTORY_BRIDGE.md",
         "examples/kernel_theorem_pins.json",
         "examples/kernel_census_targets.json",
+        "examples/resource_metrics_stub.json",
         "src/qkernel/kernel_census.py",
+        "src/qkernel/resource_oracle.py",
         "src/qkernel/py.typed",
     ]:
         assert (ROOT / rel).exists()

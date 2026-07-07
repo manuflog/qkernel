@@ -91,6 +91,7 @@ qkernel enumerate-kernels examples/peres_mermin.json          # all minimal kern
 qkernel kernel-census                                         # zoo minimal-kernel census
 qkernel kernel-census --target-dm 8,2 --target-dm 16,2        # track open K(d,m) targets
 qkernel kernel-census --target-file examples/kernel_census_targets.json
+qkernel resource-features examples/peres_mermin.json          # export features for an external resource oracle
 qkernel minimal-test XI IX XX IY YI YY XY YX ZZ               # cheapest test from device Paulis
 qkernel activation examples/activation_base_d4.json           # does d->2d embedding activate?
 qkernel activation-resource examples/activation_base_d4.json  # cheapest activated test
@@ -152,6 +153,14 @@ Two applications are built on it:
   factory-template compatibility, renders research reports, and explicitly preserves non-claims
   around overhead, thresholds, fidelity, acceptance probability, code distance, decoder behavior,
   and space-time volume. See [`docs/MAGICSCOUT.md`](docs/MAGICSCOUT.md).
+- **Resource oracle bridge** (`qkernel.resource_oracle`, `resource-features` CLI):
+  export qkernel kernel features next to externally supplied T-count, T-depth,
+  magic-injection, or stabilizer-rank metrics. This is a correlation-study
+  bridge, not a resource predictor. See [`docs/RESOURCE_ORACLE.md`](docs/RESOURCE_ORACLE.md).
+
+The staged plan for compiler, magic-state, circuit-builder, optimizer, and
+factory-candidate development is tracked in
+[`docs/PRD_COMPILER_MAGIC_FACTORY_BRIDGE.md`](docs/PRD_COMPILER_MAGIC_FACTORY_BRIDGE.md).
 
 This is classical analysis (no quantum speedup is claimed); the design value is composability.
 
@@ -187,7 +196,7 @@ The key implementation rule is:
 4. Minimum-weight odd-$Q$ optimization beyond brute-force enumeration. **done** — five backends
    (span / bounded-weight / branch-bound / heuristic / CP-SAT); the heuristic scales past cycle-dim 5000
    and CP-SAT *certifies* minimality where enumeration is infeasible. See [`docs/SOLVERS.md`](docs/SOLVERS.md).
-5. Resource-estimator experiments (kernel features vs T-count, magic, stabilizer rank). **open** — needs an external resource oracle.
+5. Resource-estimator experiments (kernel features vs T-count, magic, stabilizer rank). **bridge added** — `resource-features` accepts external oracle metrics; validated correlation studies remain open.
 6. Qudit demos for even $d=4,6,8$. **done** — obstruction spectrum $H(d)=\{0,d/2\}$, 2-primary tower, and d→2d activation.
 
 See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the phase-by-phase status (Phases 1–3 complete, Phase 4 applications delivered).

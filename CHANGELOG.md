@@ -18,6 +18,11 @@
   D,M` tracks open or pinned K(d,m) research targets such as `(8,2)` and `(16,2)`.
 - Added `kernel-census --target-file` plus `examples/kernel_census_targets.json`
   so atlas target plans can carry target IDs, priority, source, and rationale.
+- Added `qkernel.resource_oracle` and the `resource-features` CLI to export
+  qkernel kernel features alongside externally supplied T-count/T-depth/magic
+  metrics without claiming qkernel predicts those resources.
+- Added `docs/PRD_COMPILER_MAGIC_FACTORY_BRIDGE.md`, a staged plan for compiler,
+  magic-state, optimizer, circuit-builder, and factory-candidate development.
 - The development extra includes `numpy>=1.26`, matching test paths that import
   the Qiskit protocol exporter.
 - Added `docs/KERNEL_CENSUS.md` and `tests/test_kernel_census.py`.
