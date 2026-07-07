@@ -1,0 +1,19 @@
+{
+  "schema": "qkernel.factory_candidates.v1",
+  "corpus_id": "factory_candidate_demo",
+  "factory_candidates": [
+    {
+      "candidate_id": "pm_magic_verification_candidate",
+      "protocol": "magic_protocol_pm_probe.json",
+      "required_templates": [
+        "contextuality_witness",
+        "magic_verification_subroutine"
+      ],
+      "factory_metrics_status": "not_provided",
+      "factory_metrics_ref": "",
+      "resource_metrics_status": "not_provided",
+      "resource_metrics_ref": "",
+      "rationale": "Peres-Mermin MagicScout probe is a compact contextuality verification motif worth tracking as a factory-adjacent candidate, but no factory metrics are attached."
+    }
+  ]
+}

@@ -239,6 +239,9 @@ negative controls for forbidden optimizer claims
 
 ### M3: Factory Candidate Corpus
 
+Status: initial MagicScout factory-candidate corpus bridge implemented on the
+active branch.
+
 Deliverables:
 
 ```text

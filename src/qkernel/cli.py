@@ -31,6 +31,11 @@ from .compiler_candidates import (
     compiler_candidate_corpus_report_dict,
     write_compiler_candidate_markdown,
 )
+from .factory_candidates import (
+    factory_candidate_corpus_report,
+    factory_candidate_corpus_report_dict,
+    write_factory_candidate_markdown,
+)
 from .kernel_census import (
     kernel_census_report_dict,
     load_kernel_census_targets,
@@ -345,6 +350,10 @@ def main() -> None:
     compiler_candidates_cmd = sub.add_parser("compiler-candidates", help="report a compiler-candidate corpus")
     compiler_candidates_cmd.add_argument("path")
     compiler_candidates_cmd.add_argument("--out-md", help="optional Markdown report path")
+
+    factory_candidates_cmd = sub.add_parser("factory-candidates", help="report a MagicScout factory-candidate corpus")
+    factory_candidates_cmd.add_argument("path")
+    factory_candidates_cmd.add_argument("--out-md", help="optional Markdown report path")
 
     resource_features_cmd = sub.add_parser("resource-features", help="export qkernel features for external resource-oracle comparison")
     resource_features_cmd.add_argument("path")
@@ -812,6 +821,15 @@ def main() -> None:
         print(json.dumps(data, indent=2))
         if args.out_md:
             print(f"wrote Markdown compiler candidate report: {args.out_md}")
+
+    elif args.command == "factory-candidates":
+        report = factory_candidate_corpus_report(args.path)
+        data = factory_candidate_corpus_report_dict(report)
+        if args.out_md:
+            write_factory_candidate_markdown(report, args.out_md)
+        print(json.dumps(data, indent=2))
+        if args.out_md:
+            print(f"wrote Markdown factory candidate report: {args.out_md}")
 
     elif args.command == "resource-features":
         program = _load_by_kind(args.path, args.input)

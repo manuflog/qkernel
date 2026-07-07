@@ -26,6 +26,9 @@
 - Added `qkernel.compiler_candidates` and the `compiler-candidates` CLI for
   before/after compiler-candidate corpora with semantic-proof and resource-metric
   status tracked separately from qkernel diagnostics.
+- Added `qkernel.factory_candidates` and the `factory-candidates` CLI for
+  MagicScout factory-adjacent candidate corpora with template compatibility,
+  missing factory metrics, and non-claims tracked.
 - The development extra includes `numpy>=1.26`, matching test paths that import
   the Qiskit protocol exporter.
 - Added `docs/KERNEL_CENSUS.md` and `tests/test_kernel_census.py`.

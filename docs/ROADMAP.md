@@ -47,6 +47,8 @@ semantics (shared `observable` vs independent `event` scope) are verified
       factory-candidate development (`docs/PRD_COMPILER_MAGIC_FACTORY_BRIDGE.md`).
 - [x] compiler-candidate corpus bridge (`compiler-candidates`): before/after
       diagnostic reports with semantic-proof and resource-metric status tracked.
+- [x] factory-candidate corpus bridge (`factory-candidates`): MagicScout motifs
+      with template compatibility, missing factory metrics, and non-claims tracked.
 - [ ] validated correlation study over an external resource-oracle corpus.
 
 ## Status

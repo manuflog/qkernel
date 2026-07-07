@@ -93,6 +93,7 @@ qkernel kernel-census --target-dm 8,2 --target-dm 16,2        # track open K(d,m
 qkernel kernel-census --target-file examples/kernel_census_targets.json
 qkernel resource-features examples/peres_mermin.json          # export features for an external resource oracle
 qkernel compiler-candidates examples/compiler_candidate_corpus.json
+qkernel factory-candidates examples/factory_candidate_corpus.json
 qkernel minimal-test XI IX XX IY YI YY XY YX ZZ               # cheapest test from device Paulis
 qkernel activation examples/activation_base_d4.json           # does d->2d embedding activate?
 qkernel activation-resource examples/activation_base_d4.json  # cheapest activated test
@@ -162,6 +163,10 @@ Two applications are built on it:
   package before/after compiler-pass ideas with qkernel diagnostics, semantic-proof
   status, resource-metric status, and rewrite-policy guardrails. See
   [`docs/COMPILER_CANDIDATES.md`](docs/COMPILER_CANDIDATES.md).
+- **Factory candidate corpus** (`qkernel.factory_candidates`, `factory-candidates` CLI):
+  package MagicScout protocol motifs with template compatibility, missing factory
+  metrics, resource-metric status, and non-claims. See
+  [`docs/FACTORY_CANDIDATES.md`](docs/FACTORY_CANDIDATES.md).
 
 The staged plan for compiler, magic-state, circuit-builder, optimizer, and
 factory-candidate development is tracked in
