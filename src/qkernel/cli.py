@@ -37,6 +37,11 @@ from .release_audit import run_release_audit, release_audit_dict, write_release_
 from .github_ready import run_github_ready_check, github_ready_report_dict, write_github_ready_report
 from .backends.pysat_backend import OptionalBackendUnavailable, solve_sat_with_pysat, solve_maxsat_with_rc2
 from .compiler import compiler_report_dict, compare_compiler_pass_dict
+from .impact_register import (
+    impact_register_report,
+    impact_register_report_dict,
+    write_impact_register_markdown,
+)
 from .compiler_candidates import (
     compiler_candidate_corpus_report,
     compiler_candidate_corpus_report_dict,
@@ -384,6 +389,9 @@ def main() -> None:
     correlation_study_cmd.add_argument("path")
     correlation_study_cmd.add_argument("--out-md", help="optional Markdown report path")
     correlation_study_cmd.add_argument("--out-csv", help="optional joined CSV table path")
+
+    impact_register_cmd = sub.add_parser("impact-register", help="report qkernel application tracks, evidence gaps, and claim boundaries")
+    impact_register_cmd.add_argument("--out-md", help="optional Markdown report path")
 
     pysat_cmd = sub.add_parser("solve-pysat", help="optional PySAT fixed-k feasibility backend")
     pysat_cmd.add_argument("path")
@@ -890,6 +898,15 @@ def main() -> None:
             print(f"wrote Markdown correlation study report: {args.out_md}")
         if args.out_csv:
             print(f"wrote CSV correlation study table: {args.out_csv}")
+
+    elif args.command == "impact-register":
+        report = impact_register_report()
+        data = impact_register_report_dict(report)
+        if args.out_md:
+            write_impact_register_markdown(report, args.out_md)
+        print(json.dumps(data, indent=2))
+        if args.out_md:
+            print(f"wrote Markdown impact register: {args.out_md}")
 
     elif args.command == "solve-pysat":
         program = _load_by_kind(args.path, args.input)

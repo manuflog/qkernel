@@ -177,6 +177,11 @@ Two applications are built on it:
   join qkernel feature rows with externally supplied resource metrics and
   negative controls for correlation-only studies. See
   [`docs/CORRELATION_STUDY.md`](docs/CORRELATION_STUDY.md).
+- **Application impact register** (`qkernel.impact_register`, `impact-register` CLI):
+  track current application surfaces, missing evidence, next actions, and
+  claim boundaries across compilers, optimizers, magic-state workflows,
+  circuit builders, factories, resource studies, and new PRD directions. See
+  [`docs/IMPACT_REGISTER.md`](docs/IMPACT_REGISTER.md).
 
 The staged plan for compiler, magic-state, circuit-builder, optimizer, and
 factory-candidate development is tracked in

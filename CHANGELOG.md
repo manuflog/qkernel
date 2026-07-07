@@ -37,6 +37,10 @@
   controls under explicit correlation-only language.
 - `correlation-study` can now write a joined CSV table via `--out-csv` for
   external notebooks, spreadsheets, or statistical tooling.
+- Added `qkernel.impact_register` and the `impact-register` CLI to keep
+  compiler, optimizer, circuit-builder, magic-state, factory, resource, and PRD
+  application tracks tied to current capability, missing evidence, next actions,
+  and claim boundaries.
 - The development extra includes `numpy>=1.26`, matching test paths that import
   the Qiskit protocol exporter.
 - Added `docs/KERNEL_CENSUS.md` and `tests/test_kernel_census.py`.
