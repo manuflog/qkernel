@@ -37,8 +37,8 @@ def test_release_audit_markdown_contains_key_sections():
 
 def test_release_audit_writes_outputs(tmp_path):
     report = run_release_audit(ROOT)
-    json_path = tmp_path / "audit.json"
-    md_path = tmp_path / "audit.md"
+    json_path = tmp_path / "nested" / "audit.json"
+    md_path = tmp_path / "nested" / "audit.md"
 
     write_release_audit_outputs(report, json_path=json_path, markdown_path=md_path)
 

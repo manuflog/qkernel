@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,6 +21,7 @@ def test_package_metadata_files_exist():
         "docs/APPLICATION_PACKET.md",
         "docs/PRD_APPLICATION_WORKBENCH.md",
         "docs/PRD_COMPILER_MAGIC_FACTORY_BRIDGE.md",
+        "docs/RELEASE_READINESS.md",
         "examples/application_packet_demo.json",
         "examples/circuit_manifest_d4_probe.json",
         "examples/compiler_candidate_corpus.json",
@@ -59,3 +61,28 @@ def test_compiler_optimizer_path_doc_exists():
     assert "not by relabeling kernel" in text
     assert "requires_semantic_equivalence_proof" in text
     assert "Q-Kernel reduces T-count" in text
+
+
+def test_release_readiness_doc_tracks_workbench_commands():
+    text = (ROOT / "docs/RELEASE_READINESS.md").read_text(encoding="utf-8")
+
+    assert "application-packet" in text
+    assert "--fail-on-blocked" in text
+    assert "does not claim" in text
+    assert "validated magic-state factory construction" in text
+
+
+def test_readme_local_markdown_links_exist():
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    missing: list[str] = []
+
+    for target in re.findall(r"\[[^\]]+\]\(([^)]+)\)", text):
+        if "://" in target or target.startswith("#"):
+            continue
+        path_text = target.split("#", 1)[0]
+        if not path_text:
+            continue
+        if not (ROOT / path_text).exists():
+            missing.append(target)
+
+    assert missing == []

@@ -53,10 +53,19 @@ semantics (shared `observable` vs independent `event` scope) are verified
       exporter support and explicit blockers for unsupported d,m/protocol cases.
 - [x] correlation-study harness (`correlation-study`): joins qkernel features
       with external resource metrics and negative controls for correlation-only reports.
+- [x] application impact register (`impact-register`): tracks application
+      surfaces, missing evidence, next actions, and claim boundaries.
+- [x] application workbench PRD (`application-prd`): scopes the next application
+      as a CLI-first evidence workbench before UI, optimizer, or simulator expansion.
+- [x] application evidence packets (`application-packet`): compose compiler,
+      factory, correlation, resource-feature, and circuit-manifest artifacts into
+      claim-gated Markdown/JSON review packets with optional CI failure on blocked
+      gates.
 - [ ] validated correlation study over an external resource-oracle corpus.
 
 ## Status
 
-Phases 1-3 complete; Phase 4 applications delivered. The resource-oracle bridge
-is present; validated resource-overhead correlation remains open.
+Phases 1-3 complete; Phase 4 applications delivered through a claim-gated
+application workbench. The resource-oracle bridge and packet workflow are
+present; validated resource-overhead correlation remains open.
 Solver stack: span / bounded-weight / branch-bound / heuristic / CP-SAT (see docs/SOLVERS.md).

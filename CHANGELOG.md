@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — Kernel census report
+## Unreleased — Application workbench and kernel census
 
 - Added `qkernel.kernel_census`: a conservative minimal-kernel census over the
   Contextuality Benchmark Zoo.
@@ -18,6 +18,8 @@
   D,M` tracks open or pinned K(d,m) research targets such as `(8,2)` and `(16,2)`.
 - Added `kernel-census --target-file` plus `examples/kernel_census_targets.json`
   so atlas target plans can carry target IDs, priority, source, and rationale.
+- Added `docs/RELEASE_READINESS.md` to summarize release scope, checks, and
+  claim boundaries for the application-workbench branch.
 - Added `qkernel.resource_oracle` and the `resource-features` CLI to export
   qkernel kernel features alongside externally supplied T-count/T-depth/magic
   metrics without claiming qkernel predicts those resources.

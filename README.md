@@ -96,6 +96,8 @@ qkernel compiler-candidates examples/compiler_candidate_corpus.json
 qkernel factory-candidates examples/factory_candidate_corpus.json
 qkernel circuit-manifest examples/peres_mermin.json           # circuit-builder readiness report
 qkernel correlation-study examples/resource_correlation_study.json --out-csv joined.csv
+qkernel impact-register                                       # application surface / claim-boundary map
+qkernel application-packet examples/application_packet_demo.json --out-json packet.json
 qkernel minimal-test XI IX XX IY YI YY XY YX ZZ               # cheapest test from device Paulis
 qkernel activation examples/activation_base_d4.json           # does d->2d embedding activate?
 qkernel activation-resource examples/activation_base_d4.json  # cheapest activated test
@@ -234,6 +236,8 @@ The key implementation rule is:
 6. Qudit demos for even $d=4,6,8$. **done** — obstruction spectrum $H(d)=\{0,d/2\}$, 2-primary tower, and d→2d activation.
 
 See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the phase-by-phase status (Phases 1–3 complete, Phase 4 applications delivered).
+Release-readiness notes for the current application-workbench branch are in
+[`docs/RELEASE_READINESS.md`](docs/RELEASE_READINESS.md).
 
 
 ## Pauli frontend

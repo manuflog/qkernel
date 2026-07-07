@@ -272,7 +272,11 @@ def write_release_audit_outputs(
     markdown_path: str | Path | None = None,
 ) -> None:
     if json_path is not None:
-        Path(json_path).write_text(json.dumps(release_audit_dict(report), indent=2) + "\n", encoding="utf-8")
+        json_out = Path(json_path)
+        json_out.parent.mkdir(parents=True, exist_ok=True)
+        json_out.write_text(json.dumps(release_audit_dict(report), indent=2) + "\n", encoding="utf-8")
 
     if markdown_path is not None:
-        Path(markdown_path).write_text(release_audit_markdown(report), encoding="utf-8")
+        markdown_out = Path(markdown_path)
+        markdown_out.parent.mkdir(parents=True, exist_ok=True)
+        markdown_out.write_text(release_audit_markdown(report), encoding="utf-8")
