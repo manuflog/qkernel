@@ -178,7 +178,8 @@ def test_kernel_census_tracks_witnessed_and_pinned_targets():
 
 def test_kernel_census_markdown_contains_scope_and_tables():
     pins = load_kernel_theorem_pins(ROOT / "examples/kernel_theorem_pins.json")
-    md = kernel_census_markdown(kernel_census_report_dict(theorem_pins=pins, research_targets=[(8, 2)]))
+    target_specs = load_kernel_census_targets(ROOT / "examples/kernel_census_targets.json")
+    md = kernel_census_markdown(kernel_census_report_dict(theorem_pins=pins, research_targets=target_specs))
 
     assert "# Kernel Census" in md
     assert "## By `(d,m)`" in md
@@ -186,9 +187,12 @@ def test_kernel_census_markdown_contains_scope_and_tables():
     assert "## Theorem Pins" in md
     assert "## Theorem Pin Audit" in md
     assert "## Research Targets" in md
+    assert "## Research Target Rationale" in md
     assert "matches_registered_witness" in md
     assert "open_no_registered_witness" in md
-    assert "K82" not in md
+    assert "K82" in md
+    assert "research-atlas-v7/KC" in md
+    assert "Next even-dimension K(d,m)" in md
     assert "K42_MINIMAL_CERTIFICATE" in md
     assert "peres_mermin" in md
     assert "does not prove global K(d,m) lower bounds" in md

@@ -571,12 +571,13 @@ def kernel_census_markdown(report: KernelCensusReport | dict) -> str:
         "## Research Targets",
         "",
         _table(
-            ["d,m", "target", "priority", "status", "witnessed K", "global K", "theorem", "next actions"],
+            ["d,m", "target", "priority", "source", "status", "witnessed K", "global K", "theorem", "next actions"],
             [
                 [
                     f"({target.get('d')},{target.get('m')})",
                     target.get("target_id"),
                     target.get("priority"),
+                    target.get("source"),
                     target.get("status"),
                     target.get("witnessed_min_kernel_weight"),
                     target.get("global_K_value"),
@@ -586,6 +587,14 @@ def kernel_census_markdown(report: KernelCensusReport | dict) -> str:
                 for target in research_targets
             ],
         ) or "No explicit research targets supplied.",
+        "",
+        "## Research Target Rationale",
+        "",
+        "\n".join(
+            f"- ({target.get('d')},{target.get('m')}) {target.get('target_id') or '-'}: "
+            f"{target.get('rationale') or '-'}"
+            for target in research_targets
+        ) or "-",
         "",
         "## Instances",
         "",

@@ -92,6 +92,10 @@ Reusable target plans can be loaded from JSON with `--target-file`:
 reviewers connect a census run to an atlas or research plan, but they do not
 change witnessed minima, theorem-pin validation, or claim scope.
 
+Markdown reports include the target source in the research-target table and
+render each target rationale in a separate section so open K(d,m) targets are
+reviewable without inspecting raw JSON.
+
 ## Theorem Pins
 
 External K(d,m) proofs can be recorded in a JSON file and merged into the census:
