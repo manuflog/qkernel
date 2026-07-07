@@ -1,0 +1,56 @@
+{
+  "schema": "qkernel.application_packet.v1",
+  "packet_id": "application_workbench_demo",
+  "title": "Application Workbench Demo Packet",
+  "tracked_candidates": [
+    {
+      "candidate_id": "pm_nonkernel_prune_qiskit_lite",
+      "role": "compiler_candidate",
+      "rationale": "Demo compiler-pass diagnostic with semantic-proof and resource-metric gates still closed."
+    },
+    {
+      "candidate_id": "pm_magic_verification_candidate",
+      "role": "factory_candidate",
+      "rationale": "Demo MagicScout motif that is factory-adjacent but not a validated factory."
+    },
+    {
+      "candidate_id": "peres_mermin_probe",
+      "role": "resource_correlation_row",
+      "rationale": "Demo contextual resource row with synthetic external metrics."
+    }
+  ],
+  "sources": [
+    {
+      "source_id": "compiler_demo",
+      "source_type": "compiler_candidate_corpus",
+      "path": "compiler_candidate_corpus.json",
+      "candidate_ids": [
+        "pm_nonkernel_prune_qiskit_lite"
+      ],
+      "required": true,
+      "notes": "Loaded through qkernel.compiler_candidates."
+    },
+    {
+      "source_id": "factory_demo",
+      "source_type": "factory_candidate_corpus",
+      "path": "factory_candidate_corpus.json",
+      "candidate_ids": [
+        "pm_magic_verification_candidate"
+      ],
+      "required": true,
+      "notes": "Loaded through qkernel.factory_candidates."
+    },
+    {
+      "source_id": "correlation_demo",
+      "source_type": "correlation_study",
+      "path": "resource_correlation_study.json",
+      "candidate_ids": [
+        "peres_mermin_probe",
+        "single_context_negative_control"
+      ],
+      "required": true,
+      "notes": "Includes a negative control and synthetic resource metrics for schema tests."
+    }
+  ],
+  "recommendation": "Keep this packet in evidence-gathering mode: compiler semantic proof and factory metrics are still missing."
+}

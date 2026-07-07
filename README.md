@@ -187,6 +187,10 @@ Two applications are built on it:
   that links compiler, circuit-builder, MagicScout, factory, resource, and
   correlation artifacts before any UI or simulator bridge. See
   [`docs/PRD_APPLICATION_WORKBENCH.md`](docs/PRD_APPLICATION_WORKBENCH.md).
+- **Application evidence packets** (`qkernel.application_packet`, `application-packet` CLI):
+  combine existing compiler, factory, correlation, resource, and circuit-manifest
+  artifacts into one claim-gated review packet. See
+  [`docs/APPLICATION_PACKET.md`](docs/APPLICATION_PACKET.md).
 
 The staged plan for compiler, magic-state, circuit-builder, optimizer, and
 factory-candidate development is tracked in

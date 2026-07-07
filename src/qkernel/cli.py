@@ -38,6 +38,11 @@ from .github_ready import run_github_ready_check, github_ready_report_dict, writ
 from .backends.pysat_backend import OptionalBackendUnavailable, solve_sat_with_pysat, solve_maxsat_with_rc2
 from .compiler import compiler_report_dict, compare_compiler_pass_dict
 from .application_prd import application_prd_dict, next_application_prd, write_application_prd_markdown
+from .application_packet import (
+    application_evidence_packet,
+    application_evidence_packet_dict,
+    write_application_evidence_packet_markdown,
+)
 from .impact_register import (
     impact_register_report,
     impact_register_report_dict,
@@ -396,6 +401,10 @@ def main() -> None:
 
     application_prd_cmd = sub.add_parser("application-prd", help="report the next qkernel application PRD")
     application_prd_cmd.add_argument("--out-md", help="optional Markdown PRD path")
+
+    application_packet_cmd = sub.add_parser("application-packet", help="render a qkernel application evidence packet")
+    application_packet_cmd.add_argument("path")
+    application_packet_cmd.add_argument("--out-md", help="optional Markdown evidence packet path")
 
     pysat_cmd = sub.add_parser("solve-pysat", help="optional PySAT fixed-k feasibility backend")
     pysat_cmd.add_argument("path")
@@ -920,6 +929,15 @@ def main() -> None:
         print(json.dumps(data, indent=2))
         if args.out_md:
             print(f"wrote Markdown application PRD: {args.out_md}")
+
+    elif args.command == "application-packet":
+        packet = application_evidence_packet(args.path)
+        data = application_evidence_packet_dict(packet)
+        if args.out_md:
+            write_application_evidence_packet_markdown(packet, args.out_md)
+        print(json.dumps(data, indent=2))
+        if args.out_md:
+            print(f"wrote Markdown application evidence packet: {args.out_md}")
 
     elif args.command == "solve-pysat":
         program = _load_by_kind(args.path, args.input)

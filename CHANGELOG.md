@@ -44,6 +44,9 @@
 - Added `qkernel.application_prd` and the `application-prd` CLI for a scoped
   next-application PRD that recommends a CLI-first evidence workbench before UI,
   optimizer, or factory-simulator expansion.
+- Added `qkernel.application_packet` and the `application-packet` CLI to compose
+  compiler, factory, correlation, resource, and circuit-manifest evidence into a
+  single claim-gated review packet.
 - The development extra includes `numpy>=1.26`, matching test paths that import
   the Qiskit protocol exporter.
 - Added `docs/KERNEL_CENSUS.md` and `tests/test_kernel_census.py`.
