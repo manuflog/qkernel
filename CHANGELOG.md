@@ -41,6 +41,9 @@
   compiler, optimizer, circuit-builder, magic-state, factory, resource, and PRD
   application tracks tied to current capability, missing evidence, next actions,
   and claim boundaries.
+- Added `qkernel.application_prd` and the `application-prd` CLI for a scoped
+  next-application PRD that recommends a CLI-first evidence workbench before UI,
+  optimizer, or factory-simulator expansion.
 - The development extra includes `numpy>=1.26`, matching test paths that import
   the Qiskit protocol exporter.
 - Added `docs/KERNEL_CENSUS.md` and `tests/test_kernel_census.py`.

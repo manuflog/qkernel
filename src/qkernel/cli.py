@@ -37,6 +37,7 @@ from .release_audit import run_release_audit, release_audit_dict, write_release_
 from .github_ready import run_github_ready_check, github_ready_report_dict, write_github_ready_report
 from .backends.pysat_backend import OptionalBackendUnavailable, solve_sat_with_pysat, solve_maxsat_with_rc2
 from .compiler import compiler_report_dict, compare_compiler_pass_dict
+from .application_prd import application_prd_dict, next_application_prd, write_application_prd_markdown
 from .impact_register import (
     impact_register_report,
     impact_register_report_dict,
@@ -392,6 +393,9 @@ def main() -> None:
 
     impact_register_cmd = sub.add_parser("impact-register", help="report qkernel application tracks, evidence gaps, and claim boundaries")
     impact_register_cmd.add_argument("--out-md", help="optional Markdown report path")
+
+    application_prd_cmd = sub.add_parser("application-prd", help="report the next qkernel application PRD")
+    application_prd_cmd.add_argument("--out-md", help="optional Markdown PRD path")
 
     pysat_cmd = sub.add_parser("solve-pysat", help="optional PySAT fixed-k feasibility backend")
     pysat_cmd.add_argument("path")
@@ -907,6 +911,15 @@ def main() -> None:
         print(json.dumps(data, indent=2))
         if args.out_md:
             print(f"wrote Markdown impact register: {args.out_md}")
+
+    elif args.command == "application-prd":
+        prd = next_application_prd()
+        data = application_prd_dict(prd)
+        if args.out_md:
+            write_application_prd_markdown(prd, args.out_md)
+        print(json.dumps(data, indent=2))
+        if args.out_md:
+            print(f"wrote Markdown application PRD: {args.out_md}")
 
     elif args.command == "solve-pysat":
         program = _load_by_kind(args.path, args.input)

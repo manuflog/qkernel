@@ -268,9 +268,10 @@ def _applications() -> list[ImpactApplication]:
             current_capabilities=[
                 "records candidate directions without forcing them into the current API",
                 "keeps claim boundaries visible while ideas are still speculative",
+                "provides a CLI-rendered PRD for the next application workbench",
             ],
-            commands=[],
-            docs=["docs/PRD_COMPILER_MAGIC_FACTORY_BRIDGE.md"],
+            commands=["application-prd"],
+            docs=["docs/PRD_COMPILER_MAGIC_FACTORY_BRIDGE.md", "docs/PRD_APPLICATION_WORKBENCH.md"],
             missing_evidence=[
                 "user workflow selection and requirements",
                 "prototype success metrics for each new application",

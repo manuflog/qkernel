@@ -182,6 +182,11 @@ Two applications are built on it:
   claim boundaries across compilers, optimizers, magic-state workflows,
   circuit builders, factories, resource studies, and new PRD directions. See
   [`docs/IMPACT_REGISTER.md`](docs/IMPACT_REGISTER.md).
+- **Application workbench PRD** (`qkernel.application_prd`, `application-prd` CLI):
+  render the recommended next application spec: a CLI-first evidence workbench
+  that links compiler, circuit-builder, MagicScout, factory, resource, and
+  correlation artifacts before any UI or simulator bridge. See
+  [`docs/PRD_APPLICATION_WORKBENCH.md`](docs/PRD_APPLICATION_WORKBENCH.md).
 
 The staged plan for compiler, magic-state, circuit-builder, optimizer, and
 factory-candidate development is tracked in
