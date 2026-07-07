@@ -25,6 +25,7 @@ def test_application_packet_loads_existing_evidence_sources():
     assert data["packet_id"] == "application_workbench_demo"
     assert data["summary"]["total_candidates"] == 3
     assert data["summary"]["ready_for_claims"] is False
+    assert data["summary"]["uncovered_tracked_candidates"] == []
     assert sources["compiler_demo"]["exists"] is True
     assert sources["factory_demo"]["exists"] is True
     assert sources["correlation_demo"]["exists"] is True
@@ -48,6 +49,33 @@ def test_application_packet_rejects_duplicate_tracked_candidate_ids(tmp_path):
 
     with pytest.raises(ValueError, match="duplicate tracked candidate id"):
         load_application_packet_spec(path)
+
+
+def test_application_packet_blocks_uncovered_tracked_candidates(tmp_path):
+    packet = {
+        "packet_id": "uncovered_packet",
+        "tracked_candidates": [
+            {
+                "candidate_id": "not_in_source",
+                "role": "compiler_candidate",
+            },
+        ],
+        "sources": [
+            {
+                "source_id": "correlation_demo",
+                "source_type": "correlation_study",
+                "path": str(ROOT / "examples/resource_correlation_study.json"),
+            },
+        ],
+    }
+    path = tmp_path / "packet.json"
+    path.write_text(json.dumps(packet), encoding="utf-8")
+
+    data = application_evidence_packet_dict(application_evidence_packet(path))
+
+    assert data["summary"]["ready_for_claims"] is False
+    assert data["summary"]["uncovered_tracked_candidates"] == ["not_in_source"]
+    assert "tracked candidate not covered by any loaded source: not_in_source" in data["summary"]["blocker_reasons"]
 
 
 def test_application_packet_markdown_preserves_claim_gates():

@@ -69,6 +69,7 @@ class ApplicationPacketSummary:
     total_sources: int
     missing_required_sources: int
     sources_with_blockers: int
+    uncovered_tracked_candidates: list[str]
     ready_for_claims: bool
     blocker_reasons: list[str]
 
@@ -272,6 +273,8 @@ def _summarize_source(spec: ApplicationPacketSourceSpec, packet_root: Path) -> A
 
 def _summary(sources: list[ApplicationPacketSourceSummary], candidates: list[TrackedCandidate]) -> ApplicationPacketSummary:
     blockers: list[str] = []
+    covered_candidate_ids = {candidate_id for source in sources for candidate_id in source.candidate_ids}
+    uncovered = sorted(candidate.candidate_id for candidate in candidates if candidate.candidate_id not in covered_candidate_ids)
     for source in sources:
         if not source.exists and source.required:
             blockers.append(f"required source missing: {source.source_id}")
@@ -279,11 +282,14 @@ def _summary(sources: list[ApplicationPacketSourceSummary], candidates: list[Tra
             blockers.append(f"{source.source_id} has missing evidence")
         if source.claim_gate_status == "blocked":
             blockers.append(f"{source.source_id} claim gate blocked")
+    for candidate_id in uncovered:
+        blockers.append(f"tracked candidate not covered by any loaded source: {candidate_id}")
     return ApplicationPacketSummary(
         total_candidates=len(candidates),
         total_sources=len(sources),
         missing_required_sources=sum(1 for source in sources if source.required and not source.exists),
         sources_with_blockers=sum(1 for source in sources if source.claim_gate_status == "blocked"),
+        uncovered_tracked_candidates=uncovered,
         ready_for_claims=not blockers,
         blocker_reasons=sorted(set(blockers)),
     )

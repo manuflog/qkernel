@@ -39,6 +39,11 @@ source is missing, a referenced candidate ID is absent, or the source reports
 missing evidence. A packet is `ready_for_claims` only when all required sources
 load and no source has evidence blockers.
 
+The packet summary also reports `uncovered_tracked_candidates`. Any tracked
+candidate that does not appear in at least one loaded source blocks
+`ready_for_claims`; a packet cannot make a recommendation about a candidate that
+has no supporting artifact.
+
 The packet does not claim qkernel is a production compiler, does not claim
 MagicScout motifs are validated factories, and does not claim unsupported
 circuit manifests are hardware-ready circuits.

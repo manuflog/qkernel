@@ -47,6 +47,8 @@
 - Added `qkernel.application_packet` and the `application-packet` CLI to compose
   compiler, factory, correlation, resource, and circuit-manifest evidence into a
   single claim-gated review packet.
+- Application packets now block `ready_for_claims` when a tracked candidate is
+  not covered by any loaded evidence source.
 - The development extra includes `numpy>=1.26`, matching test paths that import
   the Qiskit protocol exporter.
 - Added `docs/KERNEL_CENSUS.md` and `tests/test_kernel_census.py`.
