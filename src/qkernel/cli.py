@@ -14,6 +14,7 @@ from .circuit_manifest import (
 from .correlation_study import (
     correlation_study_report,
     correlation_study_report_dict,
+    write_correlation_study_csv,
     write_correlation_study_markdown,
 )
 from .decompose import component_summary
@@ -382,6 +383,7 @@ def main() -> None:
     correlation_study_cmd = sub.add_parser("correlation-study", help="join qkernel features with external resource metrics for correlation-only studies")
     correlation_study_cmd.add_argument("path")
     correlation_study_cmd.add_argument("--out-md", help="optional Markdown report path")
+    correlation_study_cmd.add_argument("--out-csv", help="optional joined CSV table path")
 
     pysat_cmd = sub.add_parser("solve-pysat", help="optional PySAT fixed-k feasibility backend")
     pysat_cmd.add_argument("path")
@@ -881,9 +883,13 @@ def main() -> None:
         data = correlation_study_report_dict(report)
         if args.out_md:
             write_correlation_study_markdown(report, args.out_md)
+        if args.out_csv:
+            write_correlation_study_csv(report, args.out_csv)
         print(json.dumps(data, indent=2))
         if args.out_md:
             print(f"wrote Markdown correlation study report: {args.out_md}")
+        if args.out_csv:
+            print(f"wrote CSV correlation study table: {args.out_csv}")
 
     elif args.command == "solve-pysat":
         program = _load_by_kind(args.path, args.input)

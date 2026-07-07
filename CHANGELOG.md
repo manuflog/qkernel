@@ -35,6 +35,8 @@
 - Added `qkernel.correlation_study` and the `correlation-study` CLI for joining
   qkernel features with externally supplied resource metrics and negative
   controls under explicit correlation-only language.
+- `correlation-study` can now write a joined CSV table via `--out-csv` for
+  external notebooks, spreadsheets, or statistical tooling.
 - The development extra includes `numpy>=1.26`, matching test paths that import
   the Qiskit protocol exporter.
 - Added `docs/KERNEL_CENSUS.md` and `tests/test_kernel_census.py`.

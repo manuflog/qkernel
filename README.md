@@ -95,7 +95,7 @@ qkernel resource-features examples/peres_mermin.json          # export features 
 qkernel compiler-candidates examples/compiler_candidate_corpus.json
 qkernel factory-candidates examples/factory_candidate_corpus.json
 qkernel circuit-manifest examples/peres_mermin.json           # circuit-builder readiness report
-qkernel correlation-study examples/resource_correlation_study.json
+qkernel correlation-study examples/resource_correlation_study.json --out-csv joined.csv
 qkernel minimal-test XI IX XX IY YI YY XY YX ZZ               # cheapest test from device Paulis
 qkernel activation examples/activation_base_d4.json           # does d->2d embedding activate?
 qkernel activation-resource examples/activation_base_d4.json  # cheapest activated test

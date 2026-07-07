@@ -4,9 +4,11 @@ import sys
 from pathlib import Path
 
 from qkernel.correlation_study import (
+    correlation_study_joined_rows,
     correlation_study_markdown,
     correlation_study_report,
     correlation_study_report_dict,
+    write_correlation_study_csv,
 )
 
 
@@ -34,6 +36,23 @@ def test_correlation_study_joins_features_metrics_and_controls():
     json.dumps(data)
 
 
+def test_correlation_study_joined_rows_and_csv(tmp_path):
+    report = correlation_study_report(ROOT / "examples/resource_correlation_study.json")
+    rows = correlation_study_joined_rows(report)
+
+    assert rows[0]["program_id"] == "peres_mermin_probe"
+    assert rows[0]["kernel_weight"] == 6
+    assert rows[0]["t_count"] == 7
+    assert rows[-1]["negative_control"] is True
+
+    out = tmp_path / "joined.csv"
+    write_correlation_study_csv(report, out)
+    text = out.read_text(encoding="utf-8")
+    assert "program_id,role,path,input_kind,contextual" in text
+    assert "single_context_negative_control" in text
+    assert "negative_control_do_not_infer_resource_signal" in text
+
+
 def test_correlation_study_markdown_is_correlation_only():
     report = correlation_study_report(ROOT / "examples/resource_correlation_study.json")
     md = correlation_study_markdown(report)
@@ -46,6 +65,7 @@ def test_correlation_study_markdown_is_correlation_only():
 
 def test_cli_correlation_study_writes_markdown(tmp_path):
     out = tmp_path / "correlation_study.md"
+    csv_out = tmp_path / "correlation_study.csv"
     proc = subprocess.run(
         [
             sys.executable,
@@ -55,6 +75,8 @@ def test_cli_correlation_study_writes_markdown(tmp_path):
             str(ROOT / "examples/resource_correlation_study.json"),
             "--out-md",
             str(out),
+            "--out-csv",
+            str(csv_out),
         ],
         cwd=ROOT,
         capture_output=True,
@@ -63,6 +85,8 @@ def test_cli_correlation_study_writes_markdown(tmp_path):
     )
 
     assert f"wrote Markdown correlation study report: {out}" in proc.stdout
+    assert f"wrote CSV correlation study table: {csv_out}" in proc.stdout
     data = json.loads(proc.stdout.split("\nwrote Markdown correlation study report:", 1)[0])
     assert data["summary"]["correlation_ready"] is True
     assert "does not optimize T-count" in out.read_text(encoding="utf-8")
+    assert "peres_mermin_probe" in csv_out.read_text(encoding="utf-8")

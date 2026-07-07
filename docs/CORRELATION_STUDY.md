@@ -13,6 +13,7 @@ or stabilizer rank.
 ```bash
 qkernel correlation-study examples/resource_correlation_study.json
 qkernel correlation-study examples/resource_correlation_study.json --out-md correlation_study.md
+qkernel correlation-study examples/resource_correlation_study.json --out-csv joined.csv
 ```
 
 ## Corpus Schema
@@ -53,6 +54,10 @@ at least 1 metric populated on at least 3 rows
 
 These are minimal hygiene checks, not a guarantee that a correlation is
 scientifically valid.
+
+`--out-csv` writes the joined qkernel/resource table for notebooks,
+spreadsheets, or external statistical tools. The CSV is still a correlation-only
+artifact; it does not contain model fits or resource predictions.
 
 ## Non-Claims
 

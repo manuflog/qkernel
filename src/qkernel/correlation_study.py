@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -206,6 +207,66 @@ def correlation_study_report(path: str | Path) -> CorrelationStudyReport:
 
 def correlation_study_report_dict(report: CorrelationStudyReport) -> dict:
     return asdict(report)
+
+
+JOINED_CSV_FIELDS = [
+    "program_id",
+    "role",
+    "path",
+    "input_kind",
+    "contextual",
+    "kernel_weight",
+    "n_minimal_kernels",
+    "obstruction_value",
+    "zd_avn_contextual",
+    "verified",
+    "t_count",
+    "t_depth",
+    "magic_injections",
+    "stabilizer_rank",
+    "resource_source",
+    "negative_control",
+    "interpretation_status",
+    "notes",
+]
+
+
+def correlation_study_joined_rows(report: CorrelationStudyReport | dict) -> list[dict[str, object]]:
+    data = asdict(report) if isinstance(report, CorrelationStudyReport) else report
+    out: list[dict[str, object]] = []
+    for row in data["rows"]:
+        features = row["qkernel_features"]
+        metrics = row.get("external_resource_metrics") or {}
+        out.append({
+            "program_id": row["program_id"],
+            "role": row["role"],
+            "path": row["path"],
+            "input_kind": row["input_kind"],
+            "contextual": features.get("contextual"),
+            "kernel_weight": features.get("kernel_weight"),
+            "n_minimal_kernels": features.get("n_minimal_kernels"),
+            "obstruction_value": features.get("obstruction_value"),
+            "zd_avn_contextual": features.get("zd_avn_contextual"),
+            "verified": features.get("verified"),
+            "t_count": metrics.get("t_count"),
+            "t_depth": metrics.get("t_depth"),
+            "magic_injections": metrics.get("magic_injections"),
+            "stabilizer_rank": metrics.get("stabilizer_rank"),
+            "resource_source": metrics.get("source"),
+            "negative_control": row["negative_control"],
+            "interpretation_status": row["interpretation_status"],
+            "notes": row["notes"],
+        })
+    return out
+
+
+def write_correlation_study_csv(report: CorrelationStudyReport | dict, path: str | Path) -> None:
+    rows = correlation_study_joined_rows(report)
+    with Path(path).open("w", encoding="utf-8", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=JOINED_CSV_FIELDS)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(row)
 
 
 def _fmt(value: object) -> str:
