@@ -11,6 +11,11 @@ from .circuit_manifest import (
     circuit_builder_manifest_dict,
     write_circuit_builder_manifest_markdown,
 )
+from .correlation_study import (
+    correlation_study_report,
+    correlation_study_report_dict,
+    write_correlation_study_markdown,
+)
 from .decompose import component_summary
 from .io import load_program, dump_program
 from .optimizer import compress_min_odd_q
@@ -373,6 +378,10 @@ def main() -> None:
     resource_features_cmd.add_argument("--program-id", default="program")
     resource_features_cmd.add_argument("--resource-metrics", help="optional external resource metrics JSON file")
     resource_features_cmd.add_argument("--out-md", help="optional Markdown report path")
+
+    correlation_study_cmd = sub.add_parser("correlation-study", help="join qkernel features with external resource metrics for correlation-only studies")
+    correlation_study_cmd.add_argument("path")
+    correlation_study_cmd.add_argument("--out-md", help="optional Markdown report path")
 
     pysat_cmd = sub.add_parser("solve-pysat", help="optional PySAT fixed-k feasibility backend")
     pysat_cmd.add_argument("path")
@@ -866,6 +875,15 @@ def main() -> None:
         print(json.dumps(data, indent=2))
         if args.out_md:
             print(f"wrote Markdown resource feature report: {args.out_md}")
+
+    elif args.command == "correlation-study":
+        report = correlation_study_report(args.path)
+        data = correlation_study_report_dict(report)
+        if args.out_md:
+            write_correlation_study_markdown(report, args.out_md)
+        print(json.dumps(data, indent=2))
+        if args.out_md:
+            print(f"wrote Markdown correlation study report: {args.out_md}")
 
     elif args.command == "solve-pysat":
         program = _load_by_kind(args.path, args.input)

@@ -95,6 +95,7 @@ qkernel resource-features examples/peres_mermin.json          # export features 
 qkernel compiler-candidates examples/compiler_candidate_corpus.json
 qkernel factory-candidates examples/factory_candidate_corpus.json
 qkernel circuit-manifest examples/peres_mermin.json           # circuit-builder readiness report
+qkernel correlation-study examples/resource_correlation_study.json
 qkernel minimal-test XI IX XX IY YI YY XY YX ZZ               # cheapest test from device Paulis
 qkernel activation examples/activation_base_d4.json           # does d->2d embedding activate?
 qkernel activation-resource examples/activation_base_d4.json  # cheapest activated test
@@ -172,6 +173,10 @@ Two applications are built on it:
   report whether an input is ready for the validated Qiskit exporter and why
   unsupported cases must not emit hardware-ready circuits. See
   [`docs/CIRCUIT_MANIFEST.md`](docs/CIRCUIT_MANIFEST.md).
+- **Correlation study harness** (`qkernel.correlation_study`, `correlation-study` CLI):
+  join qkernel feature rows with externally supplied resource metrics and
+  negative controls for correlation-only studies. See
+  [`docs/CORRELATION_STUDY.md`](docs/CORRELATION_STUDY.md).
 
 The staged plan for compiler, magic-state, circuit-builder, optimizer, and
 factory-candidate development is tracked in

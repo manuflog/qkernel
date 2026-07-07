@@ -1,0 +1,54 @@
+{
+  "schema": "qkernel.correlation_study.v1",
+  "study_id": "resource_correlation_demo",
+  "rows": [
+    {
+      "program_id": "peres_mermin_probe",
+      "path": "peres_mermin.json",
+      "input_kind": "weyl",
+      "role": "candidate",
+      "external_resource_metrics": {
+        "program_id": "peres_mermin_probe",
+        "source": "demo-external-oracle",
+        "t_count": 7,
+        "t_depth": 3,
+        "magic_injections": 1,
+        "stabilizer_rank": null,
+        "notes": "Synthetic demo metric row for schema testing only."
+      },
+      "notes": "Contextual benchmark row."
+    },
+    {
+      "program_id": "cert4_d4_probe",
+      "path": "activation_base_d4.json",
+      "input_kind": "weyl",
+      "role": "candidate",
+      "external_resource_metrics": {
+        "program_id": "cert4_d4_probe",
+        "source": "demo-external-oracle",
+        "t_count": 11,
+        "t_depth": 5,
+        "magic_injections": 2,
+        "stabilizer_rank": null,
+        "notes": "Synthetic demo metric row for schema testing only."
+      },
+      "notes": "High-d row included to exercise feature extraction and metric attachment."
+    },
+    {
+      "program_id": "single_context_negative_control",
+      "path": "row_only_pauli.json",
+      "input_kind": "pauli",
+      "role": "negative_control",
+      "external_resource_metrics": {
+        "program_id": "single_context_negative_control",
+        "source": "demo-external-oracle",
+        "t_count": 0,
+        "t_depth": 0,
+        "magic_injections": 0,
+        "stabilizer_rank": null,
+        "notes": "Synthetic negative-control metric row for schema testing only."
+      },
+      "notes": "Non-contextual negative control."
+    }
+  ]
+}

@@ -269,6 +269,8 @@ hardware-readiness gates
 
 ### M5: Correlation Study Harness
 
+Status: initial correlation-study harness implemented on the active branch.
+
 Deliverables:
 
 ```text
