@@ -94,6 +94,7 @@ qkernel kernel-census --target-file examples/kernel_census_targets.json
 qkernel resource-features examples/peres_mermin.json          # export features for an external resource oracle
 qkernel compiler-candidates examples/compiler_candidate_corpus.json
 qkernel factory-candidates examples/factory_candidate_corpus.json
+qkernel circuit-manifest examples/peres_mermin.json           # circuit-builder readiness report
 qkernel minimal-test XI IX XX IY YI YY XY YX ZZ               # cheapest test from device Paulis
 qkernel activation examples/activation_base_d4.json           # does d->2d embedding activate?
 qkernel activation-resource examples/activation_base_d4.json  # cheapest activated test
@@ -167,6 +168,10 @@ Two applications are built on it:
   package MagicScout protocol motifs with template compatibility, missing factory
   metrics, resource-metric status, and non-claims. See
   [`docs/FACTORY_CANDIDATES.md`](docs/FACTORY_CANDIDATES.md).
+- **Circuit builder manifest** (`qkernel.circuit_manifest`, `circuit-manifest` CLI):
+  report whether an input is ready for the validated Qiskit exporter and why
+  unsupported cases must not emit hardware-ready circuits. See
+  [`docs/CIRCUIT_MANIFEST.md`](docs/CIRCUIT_MANIFEST.md).
 
 The staged plan for compiler, magic-state, circuit-builder, optimizer, and
 factory-candidate development is tracked in

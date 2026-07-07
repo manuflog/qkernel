@@ -6,6 +6,11 @@ import json
 from .analyzer import analyze
 from .canonicalize import canonicalization_report, canonicalize_program
 from .certificate import kernel_to_json, kernel_to_markdown, write_certificate, verify_certificate_file, inspect_certificate
+from .circuit_manifest import (
+    circuit_builder_manifest,
+    circuit_builder_manifest_dict,
+    write_circuit_builder_manifest_markdown,
+)
 from .decompose import component_summary
 from .io import load_program, dump_program
 from .optimizer import compress_min_odd_q
@@ -324,6 +329,13 @@ def main() -> None:
     export_circuit_cmd.add_argument("--out", help="write the runnable script to this path", default=None)
     export_circuit_cmd.add_argument("--contexts", help="comma-separated context indices (default: all)", default=None)
     export_circuit_cmd.add_argument("--no-verify", action="store_true", help="skip exact-sim verification (not recommended)")
+
+    circuit_manifest_cmd = sub.add_parser("circuit-manifest", help="report circuit-builder readiness without emitting a script")
+    circuit_manifest_cmd.add_argument("path")
+    circuit_manifest_cmd.add_argument("--input", choices=["weyl", "pauli", "schedule", "table", "stim-lite", "qiskit-lite"], default="weyl")
+    circuit_manifest_cmd.add_argument("--program-id", default="program")
+    circuit_manifest_cmd.add_argument("--contexts", help="comma-separated context indices (default: all)", default=None)
+    circuit_manifest_cmd.add_argument("--out-md", help="optional Markdown report path")
 
     rewrite_policies_cmd = sub.add_parser("rewrite-policies", help="list Q-Kernel rewrite/optimizer policy guardrails")
 
@@ -784,6 +796,19 @@ def main() -> None:
             "script_written_to": args.out,
             "script_chars": len(proto.script),
         }, indent=2))
+
+    elif args.command == "circuit-manifest":
+        program = _load_by_kind(args.path, args.input)
+        selected = None
+        if args.contexts:
+            selected = [int(x) for x in args.contexts.split(",") if x.strip() != ""]
+        report = circuit_builder_manifest(program, program_id=args.program_id, selected_contexts=selected)
+        data = circuit_builder_manifest_dict(report)
+        if args.out_md:
+            write_circuit_builder_manifest_markdown(report, args.out_md)
+        print(json.dumps(data, indent=2))
+        if args.out_md:
+            print(f"wrote Markdown circuit builder manifest: {args.out_md}")
 
     elif args.command == "spectrum":
         s = spectrum_summary(args.d)

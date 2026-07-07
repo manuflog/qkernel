@@ -255,6 +255,9 @@ portfolio report
 
 ### M4: Circuit Builder Roadmap Artifacts
 
+Status: initial circuit-builder readiness manifest implemented on the active
+branch.
+
 Deliverables:
 
 ```text

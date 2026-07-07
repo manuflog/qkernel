@@ -49,6 +49,8 @@ semantics (shared `observable` vs independent `event` scope) are verified
       diagnostic reports with semantic-proof and resource-metric status tracked.
 - [x] factory-candidate corpus bridge (`factory-candidates`): MagicScout motifs
       with template compatibility, missing factory metrics, and non-claims tracked.
+- [x] circuit-builder readiness manifests (`circuit-manifest`): reports current
+      exporter support and explicit blockers for unsupported d,m/protocol cases.
 - [ ] validated correlation study over an external resource-oracle corpus.
 
 ## Status

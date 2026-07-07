@@ -29,6 +29,9 @@
 - Added `qkernel.factory_candidates` and the `factory-candidates` CLI for
   MagicScout factory-adjacent candidate corpora with template compatibility,
   missing factory metrics, and non-claims tracked.
+- Added `qkernel.circuit_manifest` and the `circuit-manifest` CLI for
+  circuit-builder readiness reports that expose supported Qiskit export cases
+  and blockers for unsupported qudit/protocol cases.
 - The development extra includes `numpy>=1.26`, matching test paths that import
   the Qiskit protocol exporter.
 - Added `docs/KERNEL_CENSUS.md` and `tests/test_kernel_census.py`.
