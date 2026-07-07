@@ -49,6 +49,8 @@
   single claim-gated review packet.
 - Application packets now block `ready_for_claims` when a tracked candidate is
   not covered by any loaded evidence source.
+- Application packet JSON and Markdown now include candidate-to-source coverage
+  rows for faster PR review.
 - The development extra includes `numpy>=1.26`, matching test paths that import
   the Qiskit protocol exporter.
 - Added `docs/KERNEL_CENSUS.md` and `tests/test_kernel_census.py`.

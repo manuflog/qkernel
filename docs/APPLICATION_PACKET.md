@@ -44,6 +44,10 @@ candidate that does not appear in at least one loaded source blocks
 `ready_for_claims`; a packet cannot make a recommendation about a candidate that
 has no supporting artifact.
 
+Markdown output includes a `Candidate Coverage` table that maps each tracked
+candidate to the source IDs that cover it. This makes review easier: coverage
+gaps are visible without reading every source row.
+
 The packet does not claim qkernel is a production compiler, does not claim
 MagicScout motifs are validated factories, and does not claim unsupported
 circuit manifests are hardware-ready circuits.

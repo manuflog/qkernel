@@ -75,12 +75,21 @@ class ApplicationPacketSummary:
 
 
 @dataclass(frozen=True)
+class CandidateCoverage:
+    candidate_id: str
+    role: str
+    source_ids: list[str]
+    covered: bool
+
+
+@dataclass(frozen=True)
 class ApplicationEvidencePacket:
     schema: str
     packet_id: str
     title: str
     tracked_candidates: list[TrackedCandidate]
     sources: list[ApplicationPacketSourceSummary]
+    candidate_coverage: list[CandidateCoverage]
     summary: ApplicationPacketSummary
     recommendation: str
     claim_scope: str
@@ -295,11 +304,28 @@ def _summary(sources: list[ApplicationPacketSourceSummary], candidates: list[Tra
     )
 
 
+def _candidate_coverage(
+    sources: list[ApplicationPacketSourceSummary],
+    candidates: list[TrackedCandidate],
+) -> list[CandidateCoverage]:
+    out: list[CandidateCoverage] = []
+    for candidate in candidates:
+        source_ids = sorted(source.source_id for source in sources if candidate.candidate_id in source.candidate_ids)
+        out.append(CandidateCoverage(
+            candidate_id=candidate.candidate_id,
+            role=candidate.role,
+            source_ids=source_ids,
+            covered=bool(source_ids),
+        ))
+    return out
+
+
 def application_evidence_packet(path: str | Path) -> ApplicationEvidencePacket:
     packet_path = Path(path)
     spec = load_application_packet_spec(packet_path)
     sources = [_summarize_source(source, packet_path.parent) for source in spec.sources]
     summary = _summary(sources, spec.tracked_candidates)
+    coverage = _candidate_coverage(sources, spec.tracked_candidates)
     next_actions = sorted(set(action for source in sources for action in source.next_actions))
     if not next_actions:
         next_actions = ["attach more evidence before promoting application claims"]
@@ -315,6 +341,7 @@ def application_evidence_packet(path: str | Path) -> ApplicationEvidencePacket:
         title=spec.title,
         tracked_candidates=spec.tracked_candidates,
         sources=sources,
+        candidate_coverage=coverage,
         summary=summary,
         recommendation=spec.recommendation,
         claim_scope=(
@@ -392,6 +419,24 @@ def application_evidence_packet_markdown(packet: ApplicationEvidencePacket | dic
                 _fmt(source["candidate_ids"]),
                 _fmt(source["claim_gate_status"]),
                 _fmt(source["status"]),
+            ])
+            + " |"
+        )
+    lines.extend([
+        "",
+        "## Candidate Coverage",
+        "",
+        "| candidate | role | sources | covered |",
+        "| --- | --- | --- | --- |",
+    ])
+    for coverage in data["candidate_coverage"]:
+        lines.append(
+            "| "
+            + " | ".join([
+                _fmt(coverage["candidate_id"]),
+                _fmt(coverage["role"]),
+                _fmt(coverage["source_ids"]),
+                _fmt(coverage["covered"]),
             ])
             + " |"
         )

@@ -20,6 +20,7 @@ def test_application_packet_loads_existing_evidence_sources():
     packet = application_evidence_packet(ROOT / "examples/application_packet_demo.json")
     data = application_evidence_packet_dict(packet)
     sources = {source["source_id"]: source for source in data["sources"]}
+    coverage = {item["candidate_id"]: item for item in data["candidate_coverage"]}
 
     assert data["schema"] == "qkernel.application_packet.v1"
     assert data["packet_id"] == "application_workbench_demo"
@@ -32,6 +33,8 @@ def test_application_packet_loads_existing_evidence_sources():
     assert sources["compiler_demo"]["claim_gate_status"] == "blocked"
     assert "external semantic-equivalence proof is not attached" in sources["compiler_demo"]["missing_evidence"]
     assert "pm_magic_verification_candidate" in sources["factory_demo"]["candidate_ids"]
+    assert coverage["pm_nonkernel_prune_qiskit_lite"]["source_ids"] == ["compiler_demo"]
+    assert coverage["pm_magic_verification_candidate"]["covered"] is True
     json.dumps(data)
 
 
@@ -75,6 +78,14 @@ def test_application_packet_blocks_uncovered_tracked_candidates(tmp_path):
 
     assert data["summary"]["ready_for_claims"] is False
     assert data["summary"]["uncovered_tracked_candidates"] == ["not_in_source"]
+    assert data["candidate_coverage"] == [
+        {
+            "candidate_id": "not_in_source",
+            "role": "compiler_candidate",
+            "source_ids": [],
+            "covered": False,
+        }
+    ]
     assert "tracked candidate not covered by any loaded source: not_in_source" in data["summary"]["blocker_reasons"]
 
 
@@ -84,6 +95,8 @@ def test_application_packet_markdown_preserves_claim_gates():
     )
 
     assert "# Application Workbench Demo Packet" in md
+    assert "## Candidate Coverage" in md
+    assert "pm_nonkernel_prune_qiskit_lite" in md
     assert "## Missing Evidence" in md
     assert "compiler_demo" in md
     assert "does not claim qkernel is a production compiler" in md
