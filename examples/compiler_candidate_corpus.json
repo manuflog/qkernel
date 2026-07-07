@@ -1,0 +1,17 @@
+{
+  "schema": "qkernel.compiler_candidates.v1",
+  "corpus_id": "compiler_candidate_demo",
+  "compiler_candidates": [
+    {
+      "candidate_id": "pm_nonkernel_prune_qiskit_lite",
+      "before": "compiler_before_qiskit_lite.json",
+      "after": "compiler_after_qiskit_lite.json",
+      "input_kind": "qiskit-lite",
+      "semantic_equivalence_status": "not_provided",
+      "semantic_equivalence_ref": "",
+      "resource_metrics_status": "not_provided",
+      "resource_metrics_ref": "",
+      "rationale": "Demonstrates a before/after diagnostic where disconnected nonkernel checks are removed while the detected odd-Q kernel remains."
+    }
+  ]
+}

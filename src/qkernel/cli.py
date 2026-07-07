@@ -26,6 +26,11 @@ from .release_audit import run_release_audit, release_audit_dict, write_release_
 from .github_ready import run_github_ready_check, github_ready_report_dict, write_github_ready_report
 from .backends.pysat_backend import OptionalBackendUnavailable, solve_sat_with_pysat, solve_maxsat_with_rc2
 from .compiler import compiler_report_dict, compare_compiler_pass_dict
+from .compiler_candidates import (
+    compiler_candidate_corpus_report,
+    compiler_candidate_corpus_report_dict,
+    write_compiler_candidate_markdown,
+)
 from .kernel_census import (
     kernel_census_report_dict,
     load_kernel_census_targets,
@@ -336,6 +341,10 @@ def main() -> None:
     compare_pass_cmd.add_argument("before")
     compare_pass_cmd.add_argument("after")
     compare_pass_cmd.add_argument("--input", choices=["weyl", "pauli", "schedule", "table", "stim-lite", "qiskit-lite"], default="weyl")
+
+    compiler_candidates_cmd = sub.add_parser("compiler-candidates", help="report a compiler-candidate corpus")
+    compiler_candidates_cmd.add_argument("path")
+    compiler_candidates_cmd.add_argument("--out-md", help="optional Markdown report path")
 
     resource_features_cmd = sub.add_parser("resource-features", help="export qkernel features for external resource-oracle comparison")
     resource_features_cmd.add_argument("path")
@@ -794,6 +803,15 @@ def main() -> None:
         before = _load_by_kind(args.before, args.input)
         after = _load_by_kind(args.after, args.input)
         print(json.dumps(compare_compiler_pass_dict(before, after), indent=2))
+
+    elif args.command == "compiler-candidates":
+        report = compiler_candidate_corpus_report(args.path)
+        data = compiler_candidate_corpus_report_dict(report)
+        if args.out_md:
+            write_compiler_candidate_markdown(report, args.out_md)
+        print(json.dumps(data, indent=2))
+        if args.out_md:
+            print(f"wrote Markdown compiler candidate report: {args.out_md}")
 
     elif args.command == "resource-features":
         program = _load_by_kind(args.path, args.input)

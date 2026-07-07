@@ -45,6 +45,8 @@ semantics (shared `observable` vs independent `event` scope) are verified
       stabilizer-rank metrics without claiming qkernel predicts them.
 - [x] staged PRD for compiler, magic-state, optimizer, circuit-builder, and
       factory-candidate development (`docs/PRD_COMPILER_MAGIC_FACTORY_BRIDGE.md`).
+- [x] compiler-candidate corpus bridge (`compiler-candidates`): before/after
+      diagnostic reports with semantic-proof and resource-metric status tracked.
 - [ ] validated correlation study over an external resource-oracle corpus.
 
 ## Status

@@ -23,6 +23,9 @@
   metrics without claiming qkernel predicts those resources.
 - Added `docs/PRD_COMPILER_MAGIC_FACTORY_BRIDGE.md`, a staged plan for compiler,
   magic-state, optimizer, circuit-builder, and factory-candidate development.
+- Added `qkernel.compiler_candidates` and the `compiler-candidates` CLI for
+  before/after compiler-candidate corpora with semantic-proof and resource-metric
+  status tracked separately from qkernel diagnostics.
 - The development extra includes `numpy>=1.26`, matching test paths that import
   the Qiskit protocol exporter.
 - Added `docs/KERNEL_CENSUS.md` and `tests/test_kernel_census.py`.

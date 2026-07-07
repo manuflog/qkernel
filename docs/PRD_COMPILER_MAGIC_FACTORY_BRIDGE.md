@@ -224,6 +224,8 @@ tests/test_resource_oracle.py
 
 ### M2: Compiler Candidate Corpus
 
+Status: initial corpus/report bridge implemented on the active branch.
+
 Deliverables:
 
 ```text
