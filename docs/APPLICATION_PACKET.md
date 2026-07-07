@@ -10,6 +10,7 @@ Run:
 ```bash
 qkernel application-packet examples/application_packet_demo.json
 qkernel application-packet examples/application_packet_demo.json --out-md packet.md
+qkernel application-packet examples/application_packet_demo.json --fail-on-blocked
 ```
 
 ## Packet Shape
@@ -32,6 +33,14 @@ Compiler, factory, and correlation sources are loaded through the corresponding
 qkernel report code. Circuit manifests and resource-feature reports can be
 attached as pre-rendered JSON artifacts.
 
+The demo packet intentionally exercises all current source families:
+
+- compiler candidate corpus
+- factory candidate corpus
+- correlation study
+- resource-feature JSON
+- circuit-manifest JSON
+
 ## Claim Gates
 
 Each source receives a `claim_gate_status`. The gate is blocked if a required
@@ -51,3 +60,6 @@ gaps are visible without reading every source row.
 The packet does not claim qkernel is a production compiler, does not claim
 MagicScout motifs are validated factories, and does not claim unsupported
 circuit manifests are hardware-ready circuits.
+
+Use `--fail-on-blocked` in CI or PR checks when a packet should block merging
+unless every required evidence source is loaded and every claim gate is ready.

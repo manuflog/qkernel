@@ -210,7 +210,8 @@ def _extract_missing_evidence(source_type: SourceType, data: dict[str, Any]) -> 
     elif source_type == "circuit_manifest_json":
         missing.extend(str(x) for x in data.get("blocker_reasons", []))
     elif source_type == "resource_feature_json":
-        metrics = data.get("external_resource_metrics")
+        missing.extend(str(x) for x in data.get("missing_evidence", []))
+        metrics = data.get("external_metrics", data.get("external_resource_metrics"))
         if not metrics:
             missing.append("external resource metrics are not attached")
     return sorted(set(x for x in missing if x))

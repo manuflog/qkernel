@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 
 from .analyzer import analyze
 from .canonicalize import canonicalization_report, canonicalize_program
@@ -405,6 +406,11 @@ def main() -> None:
     application_packet_cmd = sub.add_parser("application-packet", help="render a qkernel application evidence packet")
     application_packet_cmd.add_argument("path")
     application_packet_cmd.add_argument("--out-md", help="optional Markdown evidence packet path")
+    application_packet_cmd.add_argument(
+        "--fail-on-blocked",
+        action="store_true",
+        help="exit nonzero when the packet is not ready_for_claims",
+    )
 
     pysat_cmd = sub.add_parser("solve-pysat", help="optional PySAT fixed-k feasibility backend")
     pysat_cmd.add_argument("path")
@@ -938,6 +944,9 @@ def main() -> None:
         print(json.dumps(data, indent=2))
         if args.out_md:
             print(f"wrote Markdown application evidence packet: {args.out_md}")
+        if args.fail_on_blocked and not data["summary"]["ready_for_claims"]:
+            print("application evidence packet claim gates blocked", file=sys.stderr)
+            raise SystemExit(1)
 
     elif args.command == "solve-pysat":
         program = _load_by_kind(args.path, args.input)

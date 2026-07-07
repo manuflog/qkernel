@@ -51,6 +51,11 @@
   not covered by any loaded evidence source.
 - Application packet JSON and Markdown now include candidate-to-source coverage
   rows for faster PR review.
+- The demo application packet now covers resource-feature and circuit-manifest
+  JSON sources, and packet gating preserves resource-feature missing-evidence
+  blockers.
+- `application-packet --fail-on-blocked` can now turn blocked claim gates into a
+  nonzero CLI exit for CI or PR review automation.
 - The development extra includes `numpy>=1.26`, matching test paths that import
   the Qiskit protocol exporter.
 - Added `docs/KERNEL_CENSUS.md` and `tests/test_kernel_census.py`.

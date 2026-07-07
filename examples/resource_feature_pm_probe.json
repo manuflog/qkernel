@@ -1,0 +1,48 @@
+{
+  "schema": "qkernel.resource_oracle.v1",
+  "features": {
+    "program_id": "peres_mermin_probe",
+    "contexts": 6,
+    "observables": 9,
+    "contextual": true,
+    "kernel_weight": 6,
+    "n_minimal_kernels": 1,
+    "obstruction_value": 1,
+    "zd_avn_contextual": true,
+    "verified": true,
+    "criterion_ledger": {
+      "criterion_id": "odd_Q_even_d_v1",
+      "claim_scope": "state_independent_parity_obstruction; minimal contextuality kernel",
+      "stronger_verifier_available": "zd_avn_valuation_v1",
+      "stronger_verifier_passed": true
+    }
+  },
+  "external_metrics": {
+    "program_id": "peres_mermin_probe",
+    "source": "external-resource-oracle-placeholder",
+    "t_count": null,
+    "t_depth": null,
+    "magic_injections": null,
+    "stabilizer_rank": null,
+    "notes": "Placeholder schema example. Fill these fields only with metrics computed by an external compiler/resource oracle."
+  },
+  "comparison_status": "external_metrics_attached",
+  "missing_evidence": [
+    "no bridge theorem from odd-Q kernel features to T-count, T-depth, magic injections, or stabilizer rank",
+    "no validated statistical correlation study attached"
+  ],
+  "next_actions": [
+    "collect an external resource-oracle table over a benchmark corpus",
+    "compare this row against additional oracle rows before interpreting trends",
+    "fit and validate correlations outside qkernel before making resource claims",
+    "keep qkernel features and external resource metrics as separate columns"
+  ],
+  "claim_scope": "exploratory feature export for external resource-correlation studies; qkernel does not compute or predict compiler resource metrics",
+  "not_claimed": [
+    "does not predict T-count",
+    "does not predict T-depth",
+    "does not predict magic injections",
+    "does not predict stabilizer rank",
+    "does not prove resource advantage"
+  ]
+}

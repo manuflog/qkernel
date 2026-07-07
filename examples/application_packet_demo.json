@@ -17,6 +17,11 @@
       "candidate_id": "peres_mermin_probe",
       "role": "resource_correlation_row",
       "rationale": "Demo contextual resource row with synthetic external metrics."
+    },
+    {
+      "candidate_id": "cert4_d4_probe",
+      "role": "circuit_readiness_probe",
+      "rationale": "Demo high-d circuit manifest that must remain blocked until a validated qudit exporter exists."
     }
   ],
   "sources": [
@@ -50,7 +55,27 @@
       ],
       "required": true,
       "notes": "Includes a negative control and synthetic resource metrics for schema tests."
+    },
+    {
+      "source_id": "resource_feature_demo",
+      "source_type": "resource_feature_json",
+      "path": "resource_feature_pm_probe.json",
+      "candidate_ids": [
+        "peres_mermin_probe"
+      ],
+      "required": true,
+      "notes": "Pre-rendered resource-feature report with placeholder external metrics."
+    },
+    {
+      "source_id": "circuit_manifest_demo",
+      "source_type": "circuit_manifest_json",
+      "path": "circuit_manifest_d4_probe.json",
+      "candidate_ids": [
+        "cert4_d4_probe"
+      ],
+      "required": true,
+      "notes": "Pre-rendered d=4 circuit manifest that is intentionally not hardware-ready."
     }
   ],
-  "recommendation": "Keep this packet in evidence-gathering mode: compiler semantic proof and factory metrics are still missing."
+  "recommendation": "Keep this packet in evidence-gathering mode: compiler semantic proof, factory metrics, resource bridge evidence, and validated qudit circuit support are still missing."
 }

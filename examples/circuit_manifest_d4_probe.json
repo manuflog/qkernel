@@ -1,0 +1,41 @@
+{
+  "schema": "qkernel.circuit_manifest.v1",
+  "program_id": "cert4_d4_probe",
+  "d": 4,
+  "m": 2,
+  "contexts": 6,
+  "observables": 17,
+  "selected_contexts": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "exportable": false,
+  "supported_exporter": null,
+  "required_protocol": null,
+  "blocker_reasons": [
+    "d=2 required for current Qiskit exporter; got d=4. Higher-d qudit protocols need a validated Z_d phase-readout design."
+  ],
+  "backend_requirements": [
+    "2 data qubits plus 1 ancilla for the current Qiskit exporter",
+    "separate ancilla measurements for each observable to avoid pinned statistics",
+    "backend supports controlled Pauli decomposition after transpilation",
+    "hardware run must report S, standard error, noncontextual bound, and sigma margin"
+  ],
+  "next_actions": [
+    "do not emit a hardware-ready circuit from this manifest",
+    "build an explicit protocol design for the unsupported d,m or context arity",
+    "add simulator/hardware validation before enabling an exporter"
+  ],
+  "claim_scope": "circuit-builder readiness manifest; describes whether qkernel can emit a currently validated protocol, not whether a circuit is resource-optimal",
+  "not_claimed": [
+    "does not synthesize unsupported qudit protocols",
+    "does not prove hardware success before execution",
+    "does not optimize circuit depth",
+    "does not optimize T-count or magic-state cost",
+    "does not certify semantic equivalence of compiler rewrites"
+  ]
+}

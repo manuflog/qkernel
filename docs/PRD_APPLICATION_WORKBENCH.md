@@ -136,6 +136,10 @@ Acceptance criteria:
 Add examples that connect current compiler and factory candidate corpora to
 resource rows.
 
+Status: initial demo packet implemented. It now covers compiler candidates,
+factory candidates, correlation rows, resource-feature JSON, and
+circuit-manifest JSON.
+
 Acceptance criteria:
 
 - Example includes at least one negative control.

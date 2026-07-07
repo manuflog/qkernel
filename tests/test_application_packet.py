@@ -24,16 +24,23 @@ def test_application_packet_loads_existing_evidence_sources():
 
     assert data["schema"] == "qkernel.application_packet.v1"
     assert data["packet_id"] == "application_workbench_demo"
-    assert data["summary"]["total_candidates"] == 3
+    assert data["summary"]["total_candidates"] == 4
+    assert data["summary"]["total_sources"] == 5
     assert data["summary"]["ready_for_claims"] is False
     assert data["summary"]["uncovered_tracked_candidates"] == []
     assert sources["compiler_demo"]["exists"] is True
     assert sources["factory_demo"]["exists"] is True
     assert sources["correlation_demo"]["exists"] is True
     assert sources["compiler_demo"]["claim_gate_status"] == "blocked"
+    assert sources["resource_feature_demo"]["claim_gate_status"] == "blocked"
+    assert sources["circuit_manifest_demo"]["claim_gate_status"] == "blocked"
     assert "external semantic-equivalence proof is not attached" in sources["compiler_demo"]["missing_evidence"]
+    assert any("bridge theorem" in item for item in sources["resource_feature_demo"]["missing_evidence"])
+    assert any("d=2 required" in item for item in sources["circuit_manifest_demo"]["missing_evidence"])
     assert "pm_magic_verification_candidate" in sources["factory_demo"]["candidate_ids"]
     assert coverage["pm_nonkernel_prune_qiskit_lite"]["source_ids"] == ["compiler_demo"]
+    assert coverage["peres_mermin_probe"]["source_ids"] == ["correlation_demo", "resource_feature_demo"]
+    assert coverage["cert4_d4_probe"]["source_ids"] == ["circuit_manifest_demo", "correlation_demo"]
     assert coverage["pm_magic_verification_candidate"]["covered"] is True
     json.dumps(data)
 
@@ -97,10 +104,12 @@ def test_application_packet_markdown_preserves_claim_gates():
     assert "# Application Workbench Demo Packet" in md
     assert "## Candidate Coverage" in md
     assert "pm_nonkernel_prune_qiskit_lite" in md
+    assert "resource_feature_demo" in md
+    assert "circuit_manifest_demo" in md
     assert "## Missing Evidence" in md
     assert "compiler_demo" in md
     assert "does not claim qkernel is a production compiler" in md
-    assert "Keep this packet in evidence-gathering mode" in md
+    assert "validated qudit circuit support" in md
 
 
 def test_cli_application_packet_writes_markdown(tmp_path):
@@ -125,3 +134,25 @@ def test_cli_application_packet_writes_markdown(tmp_path):
     data = json.loads(proc.stdout.split("\nwrote Markdown application evidence packet:", 1)[0])
     assert data["summary"]["sources_with_blockers"] >= 1
     assert "Application Workbench Demo Packet" in out.read_text(encoding="utf-8")
+
+
+def test_cli_application_packet_fail_on_blocked_exits_nonzero():
+    proc = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "qkernel.cli",
+            "application-packet",
+            str(ROOT / "examples/application_packet_demo.json"),
+            "--fail-on-blocked",
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert proc.returncode == 1
+    data = json.loads(proc.stdout)
+    assert data["summary"]["ready_for_claims"] is False
+    assert "claim gates blocked" in proc.stderr
