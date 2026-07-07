@@ -7,6 +7,7 @@ from qkernel.kernel_census import (
     KernelTheoremPin,
     kernel_census_markdown,
     kernel_census_report_dict,
+    load_kernel_census_targets,
     load_kernel_theorem_pins,
 )
 
@@ -145,6 +146,20 @@ def test_kernel_census_tracks_open_research_targets():
     assert any("construct or import" in item for item in targets[(8, 2)]["next_actions"])
 
 
+def test_kernel_census_loads_target_plan_metadata():
+    target_specs = load_kernel_census_targets(ROOT / "examples/kernel_census_targets.json")
+    data = kernel_census_report_dict(research_targets=target_specs)
+    targets = {(t["d"], t["m"]): t for t in data["research_targets"]}
+
+    assert sorted(targets) == [(4, 2), (8, 2), (16, 2)]
+    assert targets[(8, 2)]["target_id"] == "K82"
+    assert targets[(8, 2)]["priority"] == "next"
+    assert targets[(8, 2)]["source"] == "research-atlas-v7/KC"
+    assert "Next even-dimension" in targets[(8, 2)]["rationale"]
+    assert targets[(4, 2)]["status"] == "witnessed_unpinned"
+    assert "cert4_d4" in targets[(4, 2)]["witness_names"]
+
+
 def test_kernel_census_tracks_witnessed_and_pinned_targets():
     pins = load_kernel_theorem_pins(ROOT / "examples/kernel_theorem_pins.json")
     data = kernel_census_report_dict(
@@ -173,6 +188,7 @@ def test_kernel_census_markdown_contains_scope_and_tables():
     assert "## Research Targets" in md
     assert "matches_registered_witness" in md
     assert "open_no_registered_witness" in md
+    assert "K82" not in md
     assert "K42_MINIMAL_CERTIFICATE" in md
     assert "peres_mermin" in md
     assert "does not prove global K(d,m) lower bounds" in md
@@ -218,3 +234,25 @@ def test_cli_kernel_census_with_theorem_pins():
     assert summary["global_K_proven"] is True
     assert data["theorem_pins"][0]["K"] == 6
     assert data["research_targets"][0]["status"] == "open_no_registered_witness"
+
+
+def test_cli_kernel_census_with_target_file():
+    proc = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "qkernel.cli",
+            "kernel-census",
+            "--target-file",
+            str(ROOT / "examples/kernel_census_targets.json"),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    data = json.loads(proc.stdout)
+    targets = {(t["d"], t["m"]): t for t in data["research_targets"]}
+    assert targets[(8, 2)]["target_id"] == "K82"
+    assert targets[(16, 2)]["status"] == "open_no_registered_witness"

@@ -1,0 +1,29 @@
+{
+  "schema": "qkernel.kernel_census_targets.v1",
+  "research_targets": [
+    {
+      "d": 4,
+      "m": 2,
+      "target_id": "K42",
+      "priority": "pinned-baseline",
+      "source": "research-atlas-v7/KC",
+      "rationale": "Baseline target with a registered d=4 witness and optional external K(4,2)=6 theorem pin."
+    },
+    {
+      "d": 8,
+      "m": 2,
+      "target_id": "K82",
+      "priority": "next",
+      "source": "research-atlas-v7/KC",
+      "rationale": "Next even-dimension K(d,m) census target after the d=4 certificate."
+    },
+    {
+      "d": 16,
+      "m": 2,
+      "target_id": "K162",
+      "priority": "next",
+      "source": "research-atlas-v7/KC",
+      "rationale": "Tower continuation target for checking whether the d=8 pattern persists at d=16."
+    }
+  ]
+}

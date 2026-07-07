@@ -90,6 +90,7 @@ qkernel compress examples/noisy_pm.json
 qkernel enumerate-kernels examples/peres_mermin.json          # all minimal kernels
 qkernel kernel-census                                         # zoo minimal-kernel census
 qkernel kernel-census --target-dm 8,2 --target-dm 16,2        # track open K(d,m) targets
+qkernel kernel-census --target-file examples/kernel_census_targets.json
 qkernel minimal-test XI IX XX IY YI YY XY YX ZZ               # cheapest test from device Paulis
 qkernel activation examples/activation_base_d4.json           # does d->2d embedding activate?
 qkernel activation-resource examples/activation_base_d4.json  # cheapest activated test
@@ -139,8 +140,9 @@ Two applications are built on it:
 - **Kernel census** (`qkernel.kernel_census`, `kernel-census` CLI): run a conservative
   minimal-kernel census over the benchmark zoo, grouped by `(d,m)`. This is a bridge toward
   K(d,m) work, not a proof of global lower bounds. Explicit `--target-dm D,M`
-  entries keep open targets such as `K(8,2)` visible even before qkernel has a
-  registered zoo witness. See [`docs/KERNEL_CENSUS.md`](docs/KERNEL_CENSUS.md).
+  entries or `--target-file` target plans keep open targets such as `K(8,2)`
+  visible even before qkernel has a registered zoo witness. See
+  [`docs/KERNEL_CENSUS.md`](docs/KERNEL_CENSUS.md).
 - **Activation by embedding** (`qkernel.embedding`, `activation` / `activation-resource` CLI):
   a non-contextual base can become contextual under passive `d -> 2d` embedding (the *fiber
   pool*); the yield reproduces the verified research curve and falls sharply with base dimension.

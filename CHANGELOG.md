@@ -16,6 +16,8 @@
   witnessed zoo kernel for the same `(d,m)`.
 - Theorem pins now receive explicit audit records, and `kernel-census --target-dm
   D,M` tracks open or pinned K(d,m) research targets such as `(8,2)` and `(16,2)`.
+- Added `kernel-census --target-file` plus `examples/kernel_census_targets.json`
+  so atlas target plans can carry target IDs, priority, source, and rationale.
 - The development extra includes `numpy>=1.26`, matching test paths that import
   the Qiskit protocol exporter.
 - Added `docs/KERNEL_CENSUS.md` and `tests/test_kernel_census.py`.

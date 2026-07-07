@@ -13,6 +13,7 @@ not prove a global K(d,m) lower bound.
 qkernel kernel-census
 qkernel kernel-census --contextual-only
 qkernel kernel-census --theorem-pins examples/kernel_theorem_pins.json
+qkernel kernel-census --target-file examples/kernel_census_targets.json
 qkernel kernel-census --target-dm 8,2 --target-dm 16,2
 qkernel kernel-census --out-md kernel_census.md
 ```
@@ -69,6 +70,27 @@ open_no_registered_witness
 Targets do not create evidence. They only connect current qkernel witnesses,
 optional theorem pins, proof obligations, and next actions in one auditable
 record.
+
+Reusable target plans can be loaded from JSON with `--target-file`:
+
+```json
+{
+  "research_targets": [
+    {
+      "d": 8,
+      "m": 2,
+      "target_id": "K82",
+      "priority": "next",
+      "source": "research-atlas-v7/KC",
+      "rationale": "Next even-dimension K(d,m) census target after the d=4 certificate."
+    }
+  ]
+}
+```
+
+`target_id`, `priority`, `source`, and `rationale` are metadata only. They help
+reviewers connect a census run to an atlas or research plan, but they do not
+change witnessed minima, theorem-pin validation, or claim scope.
 
 ## Theorem Pins
 

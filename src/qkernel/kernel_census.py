@@ -68,9 +68,23 @@ class KernelTheoremPinAudit:
 
 
 @dataclass(frozen=True)
+class KernelCensusTargetSpec:
+    d: int
+    m: int
+    target_id: str = ""
+    priority: str = ""
+    source: str = ""
+    rationale: str = ""
+
+
+@dataclass(frozen=True)
 class KernelCensusTarget:
     d: int
     m: int
+    target_id: str
+    priority: str
+    source: str
+    rationale: str
     status: str
     witnessed_min_kernel_weight: int | None
     witness_names: list[str]
@@ -219,6 +233,39 @@ def load_kernel_theorem_pins(path: str | Path) -> list[KernelTheoremPin]:
     return pins
 
 
+def _target_spec_from_dict(item: dict[str, Any]) -> KernelCensusTargetSpec:
+    required = ["d", "m"]
+    missing = [key for key in required if key not in item]
+    if missing:
+        raise ValueError(f"kernel census target missing required field(s): {', '.join(missing)}")
+    spec = KernelCensusTargetSpec(
+        d=int(item["d"]),
+        m=int(item["m"]),
+        target_id=str(item.get("target_id", "")),
+        priority=str(item.get("priority", "")),
+        source=str(item.get("source", "")),
+        rationale=str(item.get("rationale", "")),
+    )
+    if spec.d <= 0 or spec.m <= 0:
+        raise ValueError("kernel census targets require positive d and m")
+    return spec
+
+
+def load_kernel_census_targets(path: str | Path) -> list[KernelCensusTargetSpec]:
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    targets_data = data.get("research_targets", data.get("targets", data))
+    if not isinstance(targets_data, list):
+        raise ValueError("kernel census target file must be a list or contain a `research_targets` list")
+    targets = [_target_spec_from_dict(item) for item in targets_data]
+    seen: set[tuple[int, int]] = set()
+    for target in targets:
+        key = (target.d, target.m)
+        if key in seen:
+            raise ValueError(f"duplicate kernel census target for d={target.d}, m={target.m}")
+        seen.add(key)
+    return targets
+
+
 def _audit_theorem_pins_against_entries(
     pins: list[KernelTheoremPin],
     entries: list[CensusEntry],
@@ -276,12 +323,24 @@ def _audit_theorem_pins_against_entries(
 def _research_target_records(
     entries: list[CensusEntry],
     theorem_pins: list[KernelTheoremPin],
-    targets: list[tuple[int, int]],
+    targets: list[tuple[int, int] | KernelCensusTargetSpec],
 ) -> list[KernelCensusTarget]:
     witnessed = _witnessed_minima(entries)
     pins_by_dm = {(pin.d, pin.m): pin for pin in theorem_pins}
+    specs: dict[tuple[int, int], KernelCensusTargetSpec] = {}
+    for target in targets:
+        if isinstance(target, KernelCensusTargetSpec):
+            spec = target
+        else:
+            d, m = target
+            spec = KernelCensusTargetSpec(d=d, m=m)
+        if spec.d <= 0 or spec.m <= 0:
+            raise ValueError("kernel census targets require positive d and m")
+        specs[(spec.d, spec.m)] = spec
+
     out: list[KernelCensusTarget] = []
-    for d, m in sorted(set(targets)):
+    for d, m in sorted(specs):
+        spec = specs[(d, m)]
         witness = witnessed.get((d, m))
         pin = pins_by_dm.get((d, m))
         witnessed_weight = witness[0] if witness else None
@@ -332,6 +391,10 @@ def _research_target_records(
         out.append(KernelCensusTarget(
             d=d,
             m=m,
+            target_id=spec.target_id,
+            priority=spec.priority,
+            source=spec.source,
+            rationale=spec.rationale,
             status=status,
             witnessed_min_kernel_weight=witnessed_weight,
             witness_names=witness_names,
@@ -349,7 +412,7 @@ def run_kernel_census(
     *,
     include_noncontextual: bool = True,
     theorem_pins: list[KernelTheoremPin] | None = None,
-    research_targets: list[tuple[int, int]] | None = None,
+    research_targets: list[tuple[int, int] | KernelCensusTargetSpec] | None = None,
 ) -> KernelCensusReport:
     """Run a conservative minimal-kernel census over the benchmark zoo.
 
@@ -387,7 +450,7 @@ def kernel_census_report_dict(
     *,
     include_noncontextual: bool = True,
     theorem_pins: list[KernelTheoremPin] | None = None,
-    research_targets: list[tuple[int, int]] | None = None,
+    research_targets: list[tuple[int, int] | KernelCensusTargetSpec] | None = None,
 ) -> dict:
     return asdict(run_kernel_census(
         include_noncontextual=include_noncontextual,
@@ -508,10 +571,12 @@ def kernel_census_markdown(report: KernelCensusReport | dict) -> str:
         "## Research Targets",
         "",
         _table(
-            ["d,m", "status", "witnessed K", "global K", "theorem", "next actions"],
+            ["d,m", "target", "priority", "status", "witnessed K", "global K", "theorem", "next actions"],
             [
                 [
                     f"({target.get('d')},{target.get('m')})",
+                    target.get("target_id"),
+                    target.get("priority"),
                     target.get("status"),
                     target.get("witnessed_min_kernel_weight"),
                     target.get("global_K_value"),
