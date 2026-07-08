@@ -23,6 +23,8 @@ def test_release_audit_passes():
     assert report.version == QKERNEL_VERSION
     assert "contextuality kernels" in report.safe_positioning
     assert any("not a T-count" in item for item in report.unsafe_positioning)
+    assert any(check.id == "workbench:packet_claim_gates_blocked" for check in report.checks)
+    assert any(check.id == "workbench:packet_all_source_families_present" for check in report.checks)
 
 
 def test_release_audit_markdown_contains_key_sections():
@@ -33,6 +35,7 @@ def test_release_audit_markdown_contains_key_sections():
     assert "Unsafe positioning" in md
     assert "core:pm_kernel_verified" in md
     assert "novelty:linear_system_not_claimed" in md
+    assert "workbench:packet_claim_gates_blocked" in md
 
 
 def test_release_audit_writes_outputs(tmp_path):

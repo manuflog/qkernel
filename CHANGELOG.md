@@ -20,6 +20,8 @@
   so atlas target plans can carry target IDs, priority, source, and rationale.
 - Added `docs/RELEASE_READINESS.md` to summarize release scope, checks, and
   claim boundaries for the application-workbench branch.
+- `release-audit` now checks the application-workbench docs/examples and verifies
+  the demo evidence packet preserves blocked claim gates across source families.
 - Added `qkernel.resource_oracle` and the `resource-features` CLI to export
   qkernel kernel features alongside externally supplied T-count/T-depth/magic
   metrics without claiming qkernel predicts those resources.

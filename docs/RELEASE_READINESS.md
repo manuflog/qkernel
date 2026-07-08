@@ -35,11 +35,18 @@ qkernel application-packet examples/application_packet_demo.json \
   --out-md experiments/output/application_packet.md \
   --out-json experiments/output/application_packet.json
 qkernel application-packet examples/application_packet_demo.json --fail-on-blocked
+qkernel release-audit --root . \
+  --out-json experiments/output/release_audit.json \
+  --out-md experiments/output/RELEASE_AUDIT.md
 ```
 
 The final command is expected to exit nonzero for the demo packet because the
 demo intentionally preserves blocked claim gates for missing compiler,
 factory, resource-bridge, and qudit-circuit evidence.
+
+The release audit checks the workbench docs/examples, verifies that the demo
+packet covers all current source families, and confirms that blocked claim gates
+remain blocked rather than being reported as release claims.
 
 ## Claim Boundaries
 

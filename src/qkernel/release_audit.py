@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from .adapters.qiskit_lite import load_qiskit_lite_program
+from .application_packet import application_evidence_packet, application_evidence_packet_dict
 from .compiler import compare_compiler_pass
 from .examples import peres_mermin_program
 from .fiber_lift import find_even_base_fiber_lift
@@ -71,6 +72,14 @@ def run_release_audit(root: str | Path | None = None) -> ReleaseAuditReport:
         "docs/REWRITE_POLICY.md",
         "docs/NOVELTY_HYGIENE.md",
         "docs/COMPILER_OPTIMIZER_PATH.md",
+        "docs/RELEASE_READINESS.md",
+        "docs/APPLICATION_PACKET.md",
+        "docs/IMPACT_REGISTER.md",
+        "docs/PRD_APPLICATION_WORKBENCH.md",
+        "examples/application_packet_demo.json",
+        "examples/resource_feature_pm_probe.json",
+        "examples/circuit_manifest_d4_probe.json",
+        "src/qkernel/application_packet.py",
     ]
     checks.extend(_check_file_exists(repo_root, rel) for rel in required_files)
 
@@ -201,6 +210,40 @@ def run_release_audit(root: str | Path | None = None) -> ReleaseAuditReport:
             )
         )
 
+    packet_path = repo_root / "examples" / "application_packet_demo.json"
+    if packet_path.exists():
+        packet = application_evidence_packet(packet_path)
+        packet_data = application_evidence_packet_dict(packet)
+        summary = packet_data["summary"]
+        sources = {source["source_id"]: source for source in packet_data["sources"]}
+        checks.append(
+            AuditCheck(
+                id="workbench:packet_claim_gates_blocked",
+                passed=(
+                    summary["ready_for_claims"] is False
+                    and summary["uncovered_tracked_candidates"] == []
+                    and sources["compiler_demo"]["claim_gate_status"] == "blocked"
+                    and sources["factory_demo"]["claim_gate_status"] == "blocked"
+                    and sources["resource_feature_demo"]["claim_gate_status"] == "blocked"
+                    and sources["circuit_manifest_demo"]["claim_gate_status"] == "blocked"
+                ),
+                detail="demo evidence packet preserves blocked claim gates without uncovered candidates",
+            )
+        )
+        checks.append(
+            AuditCheck(
+                id="workbench:packet_all_source_families_present",
+                passed={
+                    "compiler_candidate_corpus",
+                    "factory_candidate_corpus",
+                    "correlation_study",
+                    "resource_feature_json",
+                    "circuit_manifest_json",
+                }.issubset({source["source_type"] for source in packet_data["sources"]}),
+                detail="demo packet covers compiler, factory, correlation, resource, and circuit evidence",
+            )
+        )
+
     passed = all(check.passed for check in checks)
 
     return ReleaseAuditReport(
@@ -217,6 +260,7 @@ def run_release_audit(root: str | Path | None = None) -> ReleaseAuditReport:
             "not a certified tower-compression optimizer",
             "not proof that passive embedding is free",
             "not a compiler semantic-equivalence engine",
+            "not an application packet that upgrades missing evidence into resource or factory claims",
         ],
         public_repo_recommendation=(
             "ready for private/public-review repository; keep alpha label and conservative README positioning"
