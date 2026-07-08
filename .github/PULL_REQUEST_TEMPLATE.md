@@ -18,6 +18,7 @@ tests
 - [ ] `pytest -q`
 - [ ] `qkernel self-test`
 - [ ] `qkernel release-audit --root .`
+- [ ] Release bundle reviewed if release-facing: `docs/RELEASE_BUNDLE.md`
 - [ ] Docs updated
 - [ ] Tests added/updated
 - [ ] Claim boundaries preserved
@@ -36,3 +37,19 @@ tests
 ## Claims
 
 State exactly what this PR claims and what it does **not** claim.
+
+Claims:
+
+- TODO
+
+Does not claim:
+
+- TODO
+
+Evidence attached:
+
+- TODO
+
+Blocked gates / missing evidence:
+
+- TODO

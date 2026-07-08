@@ -10,6 +10,7 @@ def test_package_metadata_files_exist():
         "LICENSE",
         "CITATION.cff",
         "MANIFEST.in",
+        ".github/PULL_REQUEST_TEMPLATE.md",
         "CHANGELOG.md",
         "docs/KERNEL_CENSUS.md",
         "docs/ADJACENT_REPO_DECISION.md",
@@ -66,6 +67,16 @@ def test_manifest_includes_current_release_artifacts():
     assert "recursive-include paper *.tex *.bib *.md *.json *.pdf" in text
     assert "MANIFEST_QKERNEL.md" not in text
     assert "QKERNEL_NOTE_LOCATION.md" not in text
+
+
+def test_pull_request_template_preserves_claim_review_shape():
+    text = (ROOT / ".github/PULL_REQUEST_TEMPLATE.md").read_text(encoding="utf-8")
+
+    assert "docs/RELEASE_BUNDLE.md" in text
+    assert "Does not claim:" in text
+    assert "Evidence attached:" in text
+    assert "Blocked gates / missing evidence:" in text
+    assert "`qkernel release-audit --root .`" in text
 
 
 def test_compiler_optimizer_path_doc_exists():
