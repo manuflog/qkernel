@@ -23,6 +23,9 @@ magic-state factory claims.
 - `application-prd`: scoped PRD for the CLI-first application workbench
 - `application-packet`: claim-gated evidence packets with Markdown, JSON, and
   `--fail-on-blocked` support
+- `ADJACENT_REPO_DECISION.md`: decision record for when adjacent work should
+  split into an independent repo
+- `RESEARCH_PLAN.md`: paper/research scaffold and evidence gates
 
 ## Release Checks
 

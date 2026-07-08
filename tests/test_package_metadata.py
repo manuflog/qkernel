@@ -12,6 +12,7 @@ def test_package_metadata_files_exist():
         "MANIFEST.in",
         "CHANGELOG.md",
         "docs/KERNEL_CENSUS.md",
+        "docs/ADJACENT_REPO_DECISION.md",
         "docs/RESOURCE_ORACLE.md",
         "docs/COMPILER_CANDIDATES.md",
         "docs/CIRCUIT_MANIFEST.md",
@@ -21,6 +22,7 @@ def test_package_metadata_files_exist():
         "docs/APPLICATION_PACKET.md",
         "docs/PRD_APPLICATION_WORKBENCH.md",
         "docs/PRD_COMPILER_MAGIC_FACTORY_BRIDGE.md",
+        "docs/RESEARCH_PLAN.md",
         "docs/RELEASE_READINESS.md",
         "examples/application_packet_demo.json",
         "examples/circuit_manifest_d4_probe.json",
@@ -70,6 +72,23 @@ def test_release_readiness_doc_tracks_workbench_commands():
     assert "--fail-on-blocked" in text
     assert "does not claim" in text
     assert "validated magic-state factory construction" in text
+
+
+def test_adjacent_repo_decision_recommends_not_splitting_yet():
+    text = (ROOT / "docs/ADJACENT_REPO_DECISION.md").read_text(encoding="utf-8")
+
+    assert "Do not split the repository yet" in text
+    assert "qkernel-research-atlas" in text
+    assert "Current Decision" in text
+
+
+def test_research_plan_preserves_evidence_gates():
+    text = (ROOT / "docs/RESEARCH_PLAN.md").read_text(encoding="utf-8")
+
+    assert "Paper Tracks" in text
+    assert "Minimum Evidence Gates" in text
+    assert "application-packet --out-json" in text
+    assert "does not claim" in text
 
 
 def test_readme_local_markdown_links_exist():

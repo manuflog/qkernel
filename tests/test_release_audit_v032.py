@@ -25,6 +25,8 @@ def test_release_audit_passes():
     assert any("not a T-count" in item for item in report.unsafe_positioning)
     assert any(check.id == "workbench:packet_claim_gates_blocked" for check in report.checks)
     assert any(check.id == "workbench:packet_all_source_families_present" for check in report.checks)
+    assert any(check.id == "file:docs/ADJACENT_REPO_DECISION.md" for check in report.checks)
+    assert any(check.id == "file:docs/RESEARCH_PLAN.md" for check in report.checks)
 
 
 def test_release_audit_markdown_contains_key_sections():

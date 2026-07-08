@@ -238,6 +238,9 @@ The key implementation rule is:
 See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the phase-by-phase status (Phases 1–3 complete, Phase 4 applications delivered).
 Release-readiness notes for the current application-workbench branch are in
 [`docs/RELEASE_READINESS.md`](docs/RELEASE_READINESS.md).
+Adjacent-repo decision criteria and the research/paper scaffold are tracked in
+[`docs/ADJACENT_REPO_DECISION.md`](docs/ADJACENT_REPO_DECISION.md) and
+[`docs/RESEARCH_PLAN.md`](docs/RESEARCH_PLAN.md).
 
 
 ## Pauli frontend
