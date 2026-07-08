@@ -9,3 +9,7 @@ if you need it.
 `PAPER_SCAFFOLD.md` maps current and future paper tracks to qkernel artifacts,
 missing evidence, and reproducibility requirements. It is a scaffold, not a
 claim that those papers are complete.
+
+`repro_manifest_template.json` is a concrete template for future paper bundles:
+it records qkernel version/commit, input artifacts, generated packet JSON,
+external evidence sources, blocked gates, and appendix non-claims.

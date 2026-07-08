@@ -105,6 +105,7 @@ No paper should claim resource or factory impact until these are attached:
 - source-attributed external metrics
 - negative controls
 - reproducible packet JSON
+- paper reproducibility manifest based on `paper/repro_manifest_template.json`
 - explicit missing-evidence ledger
 - independent semantic-equivalence proof for compiler claims
 - external simulator or hardware assumptions for factory/circuit claims

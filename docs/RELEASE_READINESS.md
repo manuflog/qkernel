@@ -28,6 +28,8 @@ magic-state factory claims.
 - `RESEARCH_PLAN.md`: paper/research scaffold and evidence gates
 - `paper/PAPER_SCAFFOLD.md`: track-by-track map from planned papers to current
   artifacts and missing evidence
+- `paper/repro_manifest_template.json`: reproducibility manifest template for
+  future paper bundles
 
 ## Release Checks
 

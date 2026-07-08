@@ -27,6 +27,8 @@
   proceed without overclaiming.
 - Added `paper/PAPER_SCAFFOLD.md` to map proposed paper tracks to current
   artifacts, missing evidence, and reproducibility requirements.
+- Added `paper/repro_manifest_template.json` as a concrete reproducibility
+  manifest template for future paper bundles.
 - Added `qkernel.resource_oracle` and the `resource-features` CLI to export
   qkernel kernel features alongside externally supplied T-count/T-depth/magic
   metrics without claiming qkernel predicts those resources.

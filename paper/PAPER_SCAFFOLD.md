@@ -103,6 +103,10 @@ Every future paper bundle should record:
 - blocked claim gates
 - non-claims copied into the paper appendix
 
+Template:
+
+- `paper/repro_manifest_template.json`
+
 ## Current Repo Decision
 
 Keep this scaffold inside `qkernel` for now. Create an adjacent paper/research

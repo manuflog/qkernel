@@ -34,6 +34,7 @@ def test_package_metadata_files_exist():
         "examples/resource_feature_pm_probe.json",
         "examples/resource_metrics_stub.json",
         "paper/PAPER_SCAFFOLD.md",
+        "paper/repro_manifest_template.json",
         "src/qkernel/application_prd.py",
         "src/qkernel/application_packet.py",
         "src/qkernel/compiler_candidates.py",
@@ -99,6 +100,19 @@ def test_paper_scaffold_maps_tracks_to_missing_evidence():
     assert "Track D" in text
     assert "Missing before a paper claim" in text
     assert "Reproducibility Manifest Shape" in text
+    assert "paper/repro_manifest_template.json" in text
+
+
+def test_paper_repro_manifest_template_preserves_non_claims():
+    import json
+
+    data = json.loads((ROOT / "paper/repro_manifest_template.json").read_text(encoding="utf-8"))
+
+    assert data["schema"] == "qkernel.paper_repro_manifest.v1"
+    assert data["qkernel"]["git_commit"] == "REPLACE_WITH_QKERNEL_COMMIT"
+    assert data["external_evidence_sources"]
+    assert "compiler semantic proof missing" in data["blocked_claim_gates"]
+    assert any("does not claim" in item for item in data["non_claims_for_appendix"])
 
 
 def test_readme_local_markdown_links_exist():

@@ -28,6 +28,7 @@ def test_release_audit_passes():
     assert any(check.id == "file:docs/ADJACENT_REPO_DECISION.md" for check in report.checks)
     assert any(check.id == "file:docs/RESEARCH_PLAN.md" for check in report.checks)
     assert any(check.id == "file:paper/PAPER_SCAFFOLD.md" for check in report.checks)
+    assert any(check.id == "file:paper/repro_manifest_template.json" for check in report.checks)
 
 
 def test_release_audit_markdown_contains_key_sections():

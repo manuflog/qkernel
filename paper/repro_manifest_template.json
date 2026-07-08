@@ -1,0 +1,67 @@
+{
+  "schema": "qkernel.paper_repro_manifest.v1",
+  "paper_track": "application_workbench_evidence_packets",
+  "qkernel": {
+    "version": "0.52.0",
+    "git_commit": "REPLACE_WITH_QKERNEL_COMMIT",
+    "repository": "https://github.com/manuflog/qkernel"
+  },
+  "input_artifacts": [
+    {
+      "artifact_id": "demo_application_packet",
+      "path": "examples/application_packet_demo.json",
+      "kind": "application_packet_spec",
+      "role": "demo_only"
+    }
+  ],
+  "generated_artifacts": [
+    {
+      "artifact_id": "application_packet_json",
+      "path": "experiments/output/application_packet.json",
+      "command": "qkernel application-packet examples/application_packet_demo.json --out-json experiments/output/application_packet.json",
+      "kind": "application_packet_report"
+    }
+  ],
+  "external_evidence_sources": [
+    {
+      "source_id": "external_resource_oracle",
+      "status": "missing",
+      "required_for_claims": [
+        "resource correlation",
+        "T-count or T-depth trend",
+        "magic injection trend"
+      ]
+    },
+    {
+      "source_id": "compiler_semantic_equivalence",
+      "status": "missing",
+      "required_for_claims": [
+        "compiler rewrite correctness",
+        "optimizer application"
+      ]
+    },
+    {
+      "source_id": "factory_simulator_or_paper",
+      "status": "missing",
+      "required_for_claims": [
+        "factory viability",
+        "acceptance probability",
+        "output fidelity",
+        "space-time volume"
+      ]
+    }
+  ],
+  "blocked_claim_gates": [
+    "compiler semantic proof missing",
+    "factory metrics missing",
+    "resource bridge evidence missing",
+    "validated qudit circuit support missing"
+  ],
+  "non_claims_for_appendix": [
+    "does not claim qkernel is a production compiler",
+    "does not claim qkernel predicts T-count, T-depth, or magic injections",
+    "does not claim MagicScout motifs are validated magic-state factories",
+    "does not claim unsupported circuit manifests are hardware-ready circuits",
+    "does not claim external resource correlations are causal"
+  ]
+}

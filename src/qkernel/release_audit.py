@@ -79,6 +79,7 @@ def run_release_audit(root: str | Path | None = None) -> ReleaseAuditReport:
         "docs/IMPACT_REGISTER.md",
         "docs/PRD_APPLICATION_WORKBENCH.md",
         "paper/PAPER_SCAFFOLD.md",
+        "paper/repro_manifest_template.json",
         "examples/application_packet_demo.json",
         "examples/resource_feature_pm_probe.json",
         "examples/circuit_manifest_d4_probe.json",
