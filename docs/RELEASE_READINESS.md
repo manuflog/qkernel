@@ -26,6 +26,8 @@ magic-state factory claims.
 - `ADJACENT_REPO_DECISION.md`: decision record for when adjacent work should
   split into an independent repo
 - `RESEARCH_PLAN.md`: paper/research scaffold and evidence gates
+- `paper/PAPER_SCAFFOLD.md`: track-by-track map from planned papers to current
+  artifacts and missing evidence
 
 ## Release Checks
 

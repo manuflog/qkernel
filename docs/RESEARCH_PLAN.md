@@ -27,6 +27,7 @@ Status: existing software note and package infrastructure.
 Primary artifact:
 
 - `paper/qkernel_note.pdf`
+- `paper/PAPER_SCAFFOLD.md`
 - `docs/PROPOSITION_MAP.md`
 - `docs/PAPER_BENCHMARK_TABLES.md`
 
@@ -118,6 +119,8 @@ No paper should claim resource or factory impact until these are attached:
    future paper bundle.
 4. Revisit an independent repo after a real corpus, notebook suite, UI, or
    simulator bridge exists.
+5. Keep `paper/PAPER_SCAFFOLD.md` updated as the authoritative map from paper
+   tracks to current artifacts and missing evidence.
 
 ## Non-Claims
 

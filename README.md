@@ -241,6 +241,8 @@ Release-readiness notes for the current application-workbench branch are in
 Adjacent-repo decision criteria and the research/paper scaffold are tracked in
 [`docs/ADJACENT_REPO_DECISION.md`](docs/ADJACENT_REPO_DECISION.md) and
 [`docs/RESEARCH_PLAN.md`](docs/RESEARCH_PLAN.md).
+The current paper-track scaffold is in
+[`paper/PAPER_SCAFFOLD.md`](paper/PAPER_SCAFFOLD.md).
 
 
 ## Pauli frontend

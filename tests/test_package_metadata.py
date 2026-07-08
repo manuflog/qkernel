@@ -33,6 +33,7 @@ def test_package_metadata_files_exist():
         "examples/kernel_census_targets.json",
         "examples/resource_feature_pm_probe.json",
         "examples/resource_metrics_stub.json",
+        "paper/PAPER_SCAFFOLD.md",
         "src/qkernel/application_prd.py",
         "src/qkernel/application_packet.py",
         "src/qkernel/compiler_candidates.py",
@@ -89,6 +90,15 @@ def test_research_plan_preserves_evidence_gates():
     assert "Minimum Evidence Gates" in text
     assert "application-packet --out-json" in text
     assert "does not claim" in text
+
+
+def test_paper_scaffold_maps_tracks_to_missing_evidence():
+    text = (ROOT / "paper/PAPER_SCAFFOLD.md").read_text(encoding="utf-8")
+
+    assert "Track A" in text
+    assert "Track D" in text
+    assert "Missing before a paper claim" in text
+    assert "Reproducibility Manifest Shape" in text
 
 
 def test_readme_local_markdown_links_exist():

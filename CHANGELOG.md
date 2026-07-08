@@ -25,6 +25,8 @@
 - Added `docs/ADJACENT_REPO_DECISION.md` and `docs/RESEARCH_PLAN.md` to document
   when adjacent work should split out and how paper/research scaffolding should
   proceed without overclaiming.
+- Added `paper/PAPER_SCAFFOLD.md` to map proposed paper tracks to current
+  artifacts, missing evidence, and reproducibility requirements.
 - Added `qkernel.resource_oracle` and the `resource-features` CLI to export
   qkernel kernel features alongside externally supplied T-count/T-depth/magic
   metrics without claiming qkernel predicts those resources.
