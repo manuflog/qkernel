@@ -42,6 +42,7 @@ from .application_prd import application_prd_dict, next_application_prd, write_a
 from .application_packet import (
     application_evidence_packet,
     application_evidence_packet_dict,
+    write_application_evidence_packet_json,
     write_application_evidence_packet_markdown,
 )
 from .impact_register import (
@@ -944,9 +945,7 @@ def main() -> None:
         if args.out_md:
             write_application_evidence_packet_markdown(packet, args.out_md)
         if args.out_json:
-            with open(args.out_json, "w", encoding="utf-8") as fh:
-                fh.write(json_text)
-                fh.write("\n")
+            write_application_evidence_packet_json(data, args.out_json)
         print(json_text)
         if args.out_md:
             print(f"wrote Markdown application evidence packet: {args.out_md}")

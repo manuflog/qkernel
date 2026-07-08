@@ -467,4 +467,13 @@ def application_evidence_packet_markdown(packet: ApplicationEvidencePacket | dic
 
 
 def write_application_evidence_packet_markdown(packet: ApplicationEvidencePacket | dict, path: str | Path) -> None:
-    Path(path).write_text(application_evidence_packet_markdown(packet), encoding="utf-8")
+    out = Path(path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(application_evidence_packet_markdown(packet), encoding="utf-8")
+
+
+def write_application_evidence_packet_json(packet: ApplicationEvidencePacket | dict, path: str | Path) -> None:
+    out = Path(path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    data = packet if isinstance(packet, dict) else application_evidence_packet_dict(packet)
+    out.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")

@@ -79,6 +79,16 @@ def test_pull_request_template_preserves_claim_review_shape():
     assert "`qkernel release-audit --root .`" in text
 
 
+def test_release_audit_workflow_exercises_application_packet_gate():
+    text = (ROOT / ".github/workflows/release-audit.yml").read_text(encoding="utf-8")
+
+    assert "Generate application packet artifact" in text
+    assert "Verify blocked application packet fails claims gate" in text
+    assert "application-packet examples/application_packet_demo.json" in text
+    assert "--fail-on-blocked" in text
+    assert "expected demo application packet to fail blocked claim gate" in text
+
+
 def test_compiler_optimizer_path_doc_exists():
     text = (ROOT / "docs/COMPILER_OPTIMIZER_PATH.md").read_text(encoding="utf-8")
 

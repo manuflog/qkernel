@@ -143,6 +143,34 @@ def test_cli_application_packet_writes_markdown(tmp_path):
     assert "Application Workbench Demo Packet" in out.read_text(encoding="utf-8")
 
 
+def test_cli_application_packet_creates_output_parent_dirs(tmp_path):
+    out = tmp_path / "nested" / "reports" / "packet.md"
+    json_out = tmp_path / "nested" / "reports" / "packet.json"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "qkernel.cli",
+            "application-packet",
+            str(ROOT / "examples/application_packet_demo.json"),
+            "--out-md",
+            str(out),
+            "--out-json",
+            str(json_out),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    assert proc.returncode == 0
+    assert out.exists()
+    assert json_out.exists()
+    artifact = json.loads(json_out.read_text(encoding="utf-8"))
+    assert artifact["summary"]["ready_for_claims"] is False
+
+
 def test_cli_application_packet_fail_on_blocked_exits_nonzero():
     proc = subprocess.run(
         [

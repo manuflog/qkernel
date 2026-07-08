@@ -33,6 +33,11 @@
   manifests and the PDF note are included in release artifacts.
 - Expanded the pull-request template with a release-bundle checkbox and a
   structured claims / non-claims / evidence / blocked-gates section.
+- The release-audit GitHub Actions workflow now generates the demo application
+  packet and verifies that its blocked claim gates fail under
+  `application-packet --fail-on-blocked`.
+- `application-packet --out-md/--out-json` now creates parent directories for
+  generated review artifacts.
 - Added `qkernel.resource_oracle` and the `resource-features` CLI to export
   qkernel kernel features alongside externally supplied T-count/T-depth/magic
   metrics without claiming qkernel predicts those resources.

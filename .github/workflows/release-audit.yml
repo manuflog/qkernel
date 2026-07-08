@@ -21,5 +21,16 @@ jobs:
         run: pytest -q
       - name: Self test
         run: qkernel self-test
+      - name: Generate application packet artifact
+        run: |
+          qkernel application-packet examples/application_packet_demo.json \
+            --out-json experiments/output/application_packet.json \
+            --out-md experiments/output/application_packet.md
+      - name: Verify blocked application packet fails claims gate
+        run: |
+          if qkernel application-packet examples/application_packet_demo.json --fail-on-blocked; then
+            echo "expected demo application packet to fail blocked claim gate"
+            exit 1
+          fi
       - name: Release audit
         run: qkernel release-audit --root .
