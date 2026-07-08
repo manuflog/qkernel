@@ -1,10 +1,8 @@
 include README.md
 include LICENSE
 include CITATION.cff
-include MANIFEST_QKERNEL.md
-include QKERNEL_NOTE_LOCATION.md
 recursive-include docs *.md
 recursive-include examples *.json *.csv *.stim
-recursive-include paper *.tex *.bib *.md
+recursive-include paper *.tex *.bib *.md *.json *.pdf
 recursive-include experiments *.py *.md *.csv
 recursive-include src/qkernel py.typed

@@ -23,6 +23,8 @@ magic-state factory claims.
 - `application-prd`: scoped PRD for the CLI-first application workbench
 - `application-packet`: claim-gated evidence packets with Markdown, JSON, and
   `--fail-on-blocked` support
+- `RELEASE_BUNDLE.md`: ordered release-review map, required commands, and
+  package contents
 - `ADJACENT_REPO_DECISION.md`: decision record for when adjacent work should
   split into an independent repo
 - `RESEARCH_PLAN.md`: paper/research scaffold and evidence gates
@@ -47,9 +49,11 @@ qkernel release-audit --root . \
   --out-md experiments/output/RELEASE_AUDIT.md
 ```
 
-The final command is expected to exit nonzero for the demo packet because the
-demo intentionally preserves blocked claim gates for missing compiler,
-factory, resource-bridge, and qudit-circuit evidence.
+The `application-packet --fail-on-blocked` command is expected to exit nonzero
+for the demo packet because the demo intentionally preserves blocked claim gates
+for missing compiler, factory, resource-bridge, and qudit-circuit evidence.
+The `release-audit` command is expected to pass when those blocked gates remain
+blocked.
 
 The release audit checks the workbench docs/examples, verifies that the demo
 packet covers all current source families, and confirms that blocked claim gates

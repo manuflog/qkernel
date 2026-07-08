@@ -24,6 +24,7 @@ def test_package_metadata_files_exist():
         "docs/PRD_COMPILER_MAGIC_FACTORY_BRIDGE.md",
         "docs/RESEARCH_PLAN.md",
         "docs/RELEASE_READINESS.md",
+        "docs/RELEASE_BUNDLE.md",
         "examples/application_packet_demo.json",
         "examples/circuit_manifest_d4_probe.json",
         "examples/compiler_candidate_corpus.json",
@@ -59,6 +60,14 @@ def test_pyproject_has_license_and_sat_extra():
     assert "qkernel = [\"py.typed\"]" in text
 
 
+def test_manifest_includes_current_release_artifacts():
+    text = (ROOT / "MANIFEST.in").read_text(encoding="utf-8")
+
+    assert "recursive-include paper *.tex *.bib *.md *.json *.pdf" in text
+    assert "MANIFEST_QKERNEL.md" not in text
+    assert "QKERNEL_NOTE_LOCATION.md" not in text
+
+
 def test_compiler_optimizer_path_doc_exists():
     text = (ROOT / "docs/COMPILER_OPTIMIZER_PATH.md").read_text(encoding="utf-8")
 
@@ -74,6 +83,19 @@ def test_release_readiness_doc_tracks_workbench_commands():
     assert "--fail-on-blocked" in text
     assert "does not claim" in text
     assert "validated magic-state factory construction" in text
+    assert "RELEASE_BUNDLE.md" in text
+    assert "application-packet --fail-on-blocked` command is expected to exit nonzero" in text
+    assert "release-audit` command is expected to pass" in text
+
+
+def test_release_bundle_links_checks_and_claim_boundaries():
+    text = (ROOT / "docs/RELEASE_BUNDLE.md").read_text(encoding="utf-8")
+
+    assert "pytest -q" in text
+    assert "qkernel release-audit --root ." in text
+    assert "paper/repro_manifest_template.json" in text
+    assert "MANIFEST.in" in text
+    assert "does not claim" in text
 
 
 def test_adjacent_repo_decision_recommends_not_splitting_yet():

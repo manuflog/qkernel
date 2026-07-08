@@ -580,8 +580,8 @@ paper/qkernel_note.pdf
 Top-level release guide:
 
 ```text
-MANIFEST_QKERNEL.md
-QKERNEL_NOTE_LOCATION.md
+docs/RELEASE_READINESS.md
+docs/RELEASE_BUNDLE.md
 ```
 
 

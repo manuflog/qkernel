@@ -29,6 +29,8 @@
   artifacts, missing evidence, and reproducibility requirements.
 - Added `paper/repro_manifest_template.json` as a concrete reproducibility
   manifest template for future paper bundles.
+- Added `docs/RELEASE_BUNDLE.md` and updated packaging metadata so paper JSON
+  manifests and the PDF note are included in release artifacts.
 - Added `qkernel.resource_oracle` and the `resource-features` CLI to export
   qkernel kernel features alongside externally supplied T-count/T-depth/magic
   metrics without claiming qkernel predicts those resources.

@@ -73,6 +73,7 @@ def run_release_audit(root: str | Path | None = None) -> ReleaseAuditReport:
         "docs/NOVELTY_HYGIENE.md",
         "docs/COMPILER_OPTIMIZER_PATH.md",
         "docs/RELEASE_READINESS.md",
+        "docs/RELEASE_BUNDLE.md",
         "docs/ADJACENT_REPO_DECISION.md",
         "docs/RESEARCH_PLAN.md",
         "docs/APPLICATION_PACKET.md",
