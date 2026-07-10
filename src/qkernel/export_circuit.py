@@ -89,6 +89,27 @@ class ExportedProtocol:
     script: str
 
 
+def tight_nc_bound(labels, signs):
+    """Exact noncontextual bound of S = sum_i sign_i*<prod_i> over deterministic +/-1
+    assignments (exhaustive for <=20 observables; loose nc-1 fallback above that).
+    A violated constraint contributes -1, so the exact bound is typically nc-2*k_min."""
+    names = sorted({o for C in labels for o in C})
+    if len(names) > 20:
+        return float(len(labels) - 1)
+    import itertools
+    best = -float("inf")
+    for bits in itertools.product((1, -1), repeat=len(names)):
+        val = dict(zip(names, bits))
+        s = 0
+        for C, sg in zip(labels, signs):
+            p = 1
+            for o in C:
+                p *= val[o]
+            s += sg * p
+        best = max(best, s)
+    return float(best)
+
+
 def export_qiskit_protocol(
     program: WeylProgram,
     selected_contexts: list[int] | None = None,
@@ -147,7 +168,7 @@ def _render_script(labels: list[list[str]], signs: list[int]) -> str:
     non-destructive protocol (genuine, noise-sensitive)."""
     contexts = {f"C{i}": (labels[i], signs[i]) for i in range(len(labels))}
     nc = len(labels)
-    nc_bound = float(nc - 1)  # loose NC bound: at most nc-1 of the nc constraints jointly satisfiable
+    nc_bound = tight_nc_bound(labels, signs)  # exact deterministic bound (loose fallback inside)
     return (
         '"""Runnable IBM contextuality protocol, exported by qkernel export-circuit.\n'
         "Sequential non-destructive (ancilla Hadamard-test) measurement of each context's\n"
