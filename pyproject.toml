@@ -25,7 +25,7 @@ classifiers = [
 [project.optional-dependencies]
 dev = ["pytest>=8"]
 sat = ["python-sat[pblib,aiger]>=1.8.dev0"]
-cpsat = ["ortools>=9.0"]
+cpsat = ["ortools>=9.15.6755"]
 stim = ["stim>=1.14"]
 hardware = ["qiskit>=1.0", "qiskit-ibm-runtime>=0.20"]
 
